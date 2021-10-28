@@ -17,5 +17,9 @@ keygen releases delete <id>
 ```
 
 ```
+keygen releases yank <id>
+```
+
+```
 keygen releases dl <id>
 ```

@@ -1,11 +1,8 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
-
-	"github.com/keygen-sh/cli/keygenext"
 )
 
 const (
@@ -13,52 +10,59 @@ const (
 	version = "1.0.0"
 )
 
-var (
-	showVersion = flag.Bool("v", false, "Show version")
-)
+// func main() {
+// 	distCmd := flag.NewFlagSet("dist", flag.ExitOnError)
+
+// 	account := distCmd.String("account", "", "Your Keygen account ID")
+// 	product := distCmd.String("product", "", "Your Keygen product ID")
+// 	token := distCmd.String("token", "", "Your Keygen product token")
+
+// 	entitlements := distCmd.String("entitlements", "", "Attach entitlements to release")
+// 	channel := distCmd.String("channel", "", "The release channel")
+// 	platform := distCmd.String("platform", "", "The release platform")
+
+// 	if len(os.Args) < 2 {
+// 		// TODO(ezekg) Add help
+// 		fmt.Println("<help>")
+
+// 		os.Exit(1)
+// 	}
+
+// 	switch os.Args[1] {
+// 	case "genkey":
+// 		// TODO(ezekg)
+// 	case "dist":
+// 		distCmd.Parse(os.Args[2:])
+
+// 		fmt.Printf("running dist with args <%v>\n", *entitlements)
+
+// 		keygenext.Account = *account
+// 		keygenext.Product = *product
+// 		keygenext.Token = *token
+
+// 		r := &keygenext.Release{
+// 			Name:      "Version 1.0",
+// 			Version:   "1.0.0",
+// 			Filename:  "1.0.0.dmg",
+// 			Filetype:  "dmg",
+// 			Platform:  *platform,
+// 			Channel:   *channel,
+// 			ProductID: *product,
+// 			Constraints: keygenext.Constraints{
+// 				{EntitlementID: *entitlements},
+// 			},
+// 		}
+// 		fmt.Println(r.Upsert())
+// 		fmt.Println(r)
+// 	}
+// }
 
 func main() {
-	distCmd := flag.NewFlagSet("dist", flag.ExitOnError)
-
-	account := distCmd.String("account", "", "Your Keygen account ID")
-	product := distCmd.String("product", "", "Your Keygen product ID")
-	token := distCmd.String("token", "", "Your Keygen product token")
-
-	entitlements := distCmd.String("entitlements", "", "Attach entitlements to release")
-	channel := distCmd.String("channel", "", "The release channel")
-	platform := distCmd.String("platform", "", "The release platform")
-
-	if len(os.Args) < 2 {
-		// TODO(ezekg) Add help
-		fmt.Println("<help>")
-
+	opts, err := ParseArgs()
+	if err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	switch os.Args[1] {
-	case "genkey":
-		// TODO(ezekg)
-	case "dist":
-		distCmd.Parse(os.Args[2:])
-
-		fmt.Printf("running dist with args <%v>\n", *entitlements)
-
-		keygenext.Account = *account
-		keygenext.Product = *product
-		keygenext.Token = *token
-
-		r := &keygenext.Release{
-			Name:      "Version 1.0",
-			Version:   "1.0.0",
-			Filename:  "1.0.0.dmg",
-			Filetype:  "dmg",
-			Platform:  *platform,
-			Channel:   *channel,
-			ProductID: *product,
-			Constraints: keygenext.Constraints{
-				{EntitlementID: *entitlements},
-			},
-		}
-		fmt.Println(r.Upsert())
-	}
+	fmt.Println(opts)
 }

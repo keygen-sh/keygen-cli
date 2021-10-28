@@ -55,24 +55,6 @@ func ParseArgs() (*Options, error) {
 		fmt.Fprint(os.Stderr, usage2)
 	}
 
-	account := flag.String(
-		"account",
-		"",
-		"Your keygen.sh account ID.",
-	)
-
-	product := flag.String(
-		"product",
-		"",
-		"Your keygen.sh product ID.",
-	)
-
-	token := flag.String(
-		"token",
-		"",
-		"Your keygen.sh product token.",
-	)
-
 	config := flag.String(
 		"config",
 		"",
@@ -95,9 +77,6 @@ func ParseArgs() (*Options, error) {
 
 	opts := &Options{
 		command:  flag.Arg(0),
-		account:  *account,
-		product:  *product,
-		token:    *token,
 		config:   *config,
 		logto:    *logto,
 		loglevel: *loglevel,
@@ -107,14 +86,52 @@ func ParseArgs() (*Options, error) {
 	case "genkey":
 		opts.args = flag.Args()[1:]
 	case "releases":
-		if len(flag.Args()) == 1 {
+		if flag.NArg() == 1 {
 			fmt.Println("Error: you must provide a subcommand")
 			flag.Usage()
 			os.Exit(1)
 		}
 
-		opts.subcommand = flag.Arg(1)
-		opts.args = flag.Args()[2:]
+		set := flag.NewFlagSet("releases", flag.ExitOnError)
+		set.Usage = func() {
+			fmt.Fprintf(os.Stderr, usage1, os.Args[0])
+			set.PrintDefaults()
+			fmt.Fprint(os.Stderr, usage2)
+		}
+
+		subcommand := flag.Arg(1)
+		args := flag.Args()[2:]
+
+		account := set.String(
+			"account",
+			"",
+			"Your keygen.sh account ID.",
+		)
+
+		product := set.String(
+			"product",
+			"",
+			"Your keygen.sh product ID.",
+		)
+
+		token := set.String(
+			"token",
+			"",
+			"Your keygen.sh product token.",
+		)
+
+		set.Parse(args)
+
+		if subcommand == "help" {
+			set.Usage()
+			os.Exit(0)
+		}
+
+		opts.subcommand = subcommand
+		opts.args = args
+		opts.account = *account
+		opts.product = *product
+		opts.token = *token
 	case "version":
 		fmt.Println(version)
 		os.Exit(0)

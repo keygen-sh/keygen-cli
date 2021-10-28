@@ -49,31 +49,33 @@ type Options struct {
 }
 
 func ParseArgs() (*Options, error) {
-	flag.Usage = func() {
+	shared := flag.NewFlagSet("shared", flag.ExitOnError)
+	shared.Usage = func() {
 		fmt.Fprintf(os.Stderr, usage1, os.Args[0])
-		flag.PrintDefaults()
+		shared.PrintDefaults()
 		fmt.Fprint(os.Stderr, usage2)
 	}
 
-	config := flag.String(
+	config := shared.String(
 		"config",
 		"",
 		"Path to keygen configuration file. (default: $HOME/.keygen)",
 	)
 
-	logto := flag.String(
+	logto := shared.String(
 		"log",
 		"none",
 		"Write log messages to this file. 'stdout' and 'none' have special meanings.",
 	)
 
-	loglevel := flag.String(
+	loglevel := shared.String(
 		"log-level",
 		"DEBUG",
 		"The level of messages to log. One of: DEBUG, INFO, WARNING, ERROR.",
 	)
 
 	flag.Parse()
+	shared.Parse(flag.Args()[:])
 
 	opts := &Options{
 		command:  flag.Arg(0),
@@ -86,49 +88,46 @@ func ParseArgs() (*Options, error) {
 	case "genkey":
 		opts.args = flag.Args()[1:]
 	case "releases":
-		if flag.NArg() == 1 {
-			fmt.Println("Error: you must provide a subcommand")
-			flag.Usage()
-			os.Exit(1)
-		}
-
-		set := flag.NewFlagSet("releases", flag.ExitOnError)
-		set.Usage = func() {
+		cmd := flag.NewFlagSet("releases", flag.ExitOnError)
+		cmd.Usage = func() {
 			fmt.Fprintf(os.Stderr, usage1, os.Args[0])
-			set.PrintDefaults()
+			cmd.PrintDefaults()
 			fmt.Fprint(os.Stderr, usage2)
 		}
 
-		subcommand := flag.Arg(1)
-		args := flag.Args()[2:]
+		opts.subcommand = flag.Arg(1)
 
-		account := set.String(
+		account := cmd.String(
 			"account",
 			"",
 			"Your keygen.sh account ID.",
 		)
 
-		product := set.String(
+		product := cmd.String(
 			"product",
 			"",
 			"Your keygen.sh product ID.",
 		)
 
-		token := set.String(
+		token := cmd.String(
 			"token",
 			"",
 			"Your keygen.sh product token.",
 		)
 
-		set.Parse(args)
+		cmd.Parse(flag.Args()[1:])
 
-		if subcommand == "help" {
-			set.Usage()
+		switch opts.subcommand {
+		case "":
+			fmt.Println("Error: you must provide a subcommand")
+			cmd.Usage()
+			os.Exit(1)
+		case "help":
+			cmd.Usage()
 			os.Exit(0)
 		}
 
-		opts.subcommand = subcommand
-		opts.args = args
+		opts.args = flag.Args()[2:]
 		opts.account = *account
 		opts.product = *product
 		opts.token = *token
@@ -136,11 +135,11 @@ func ParseArgs() (*Options, error) {
 		fmt.Println(version)
 		os.Exit(0)
 	case "help":
-		flag.Usage()
+		shared.Usage()
 		os.Exit(0)
 	default:
-		fmt.Println("Error: you must provide a command")
-		flag.Usage()
+		fmt.Println("Error: you must provide a valid command")
+		shared.Usage()
 		os.Exit(1)
 	}
 

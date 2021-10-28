@@ -20,7 +20,6 @@ type Release struct {
 	Metadata    map[string]interface{} `json:"metadata"`
 	ProductID   string                 `json:"-"`
 	Constraints Constraints            `json:"-"`
-	Location    string                 `json:"-"`
 }
 
 func (r *Release) SetID(id string) error {

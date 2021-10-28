@@ -31,7 +31,7 @@ func (c Constraint) GetRelationships() map[string]interface{} {
 	return relationships
 }
 
-func (c Constraint) GetEmbedded() bool {
+func (c Constraint) UseExperimentalEmbeddedRelationshipData() bool {
 	return true
 }
 

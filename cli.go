@@ -6,16 +6,25 @@ import (
 	"os"
 )
 
-const usage1 string = `Usage: %s <COMMAND> [SUBCOMMAND] [OPTIONS]
+const usage1 string = `Usage: %s <command> [subcommand] [options]
 Options:
 `
 
 const usage2 string = `
 Commands:
-  keygen genkey                  Generate an Ed25519 publishing keypair.
-  keygen releases                Manage and publish releases.
-  keygen help                    Print help.
-  keygen version                 Print keygen version.
+  keygen help
+        Print a useful help message.
+  keygen version
+        Print keygen version.
+  keygen genkey
+        Generate an Ed25519 publishing keypair.
+  keygen releases <subcommand>
+        Manage and publish releases.
+        Subcommands:
+          new          Publish a new release.
+          yank         Yank a release.
+          del          Delete a release.
+          list         List releases.
 
 Examples:
   keygen genkey

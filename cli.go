@@ -6,36 +6,37 @@ import (
 	"os"
 )
 
-const usage1 string = `Usage: %s <COMMAND> [OPTIONS]
+const usage1 string = `Usage: %s <COMMAND> [SUBCOMMAND] [OPTIONS]
 Options:
 `
 
 const usage2 string = `
 Commands:
-	keygen genkey                  Generate an Ed25519 publishing keypair.
-	keygen dist                    Publish a new release artifact.
-	keygen help                    Print help.
-	keygen version                 Print keygen version.
+  keygen genkey                  Generate an Ed25519 publishing keypair.
+  keygen releases                Manage and publish releases.
+  keygen help                    Print help.
+  keygen version                 Print keygen version.
 
 Examples:
-	keygen genkey
-	keygen dist ./dist/app-1-0-0 \
-		--account ... \
-		--product ... \
-		--token ... \
-		...
+  keygen genkey
+  keygen releases new ./dist/app-1-0-0 \
+    --account ... \
+    --product ... \
+    --token ... \
+    ...
 
 `
 
 type Options struct {
-	command  string
-	args     []string
-	account  string
-	product  string
-	token    string
-	config   string
-	logto    string
-	loglevel string
+	command    string
+	subcommand string
+	args       []string
+	account    string
+	product    string
+	token      string
+	config     string
+	logto      string
+	loglevel   string
 }
 
 func ParseArgs() (*Options, error) {
@@ -96,8 +97,15 @@ func ParseArgs() (*Options, error) {
 	switch opts.command {
 	case "genkey":
 		opts.args = flag.Args()[1:]
-	case "dist":
-		opts.args = flag.Args()[1:]
+	case "releases":
+		if len(flag.Args()) == 1 {
+			fmt.Println("Error: you must provide a subcommand")
+			flag.Usage()
+			os.Exit(1)
+		}
+
+		opts.subcommand = flag.Arg(1)
+		opts.args = flag.Args()[2:]
 	case "version":
 		fmt.Println(version)
 		os.Exit(0)
@@ -105,6 +113,7 @@ func ParseArgs() (*Options, error) {
 		flag.Usage()
 		os.Exit(0)
 	default:
+		fmt.Println("Error: you must provide a command")
 		flag.Usage()
 		os.Exit(1)
 	}

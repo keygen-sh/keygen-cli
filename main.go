@@ -1,13 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"os"
-)
-
-const (
-	// The current version of the program
-	version = "1.0.0"
+	"github.com/keygen-sh/cli/cmd"
 )
 
 // func main() {
@@ -58,11 +52,5 @@ const (
 // }
 
 func main() {
-	opts, err := ParseArgs()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	fmt.Println(opts)
+	cmd.Execute()
 }

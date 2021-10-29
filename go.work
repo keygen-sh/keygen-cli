@@ -2,4 +2,5 @@ go 1.17
 
 directory (
 	./keygenext
+	./cmd
 )

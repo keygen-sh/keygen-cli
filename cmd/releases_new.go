@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
 
@@ -15,10 +16,14 @@ var (
 		Short: "Publish a new release for a product",
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
-				return errors.New("<path> to file is required")
+				return errors.New("path to file is required")
 			}
 
-			path := args[0]
+			path, err := homedir.Expand(args[0])
+			if err != nil {
+				return fmt.Errorf(`path "%s" is not expandable (%s)`, args[0], err)
+			}
+
 			info, err := os.Stat(path)
 			if err != nil {
 				reason, ok := err.(*os.PathError)
@@ -26,11 +31,11 @@ var (
 					return err
 				}
 
-				return fmt.Errorf("<path> is not accessible (%s)", reason.Err)
+				return fmt.Errorf(`path "%s" is not readable (%s)`, path, reason.Err)
 			}
 
 			if info.IsDir() {
-				return errors.New("<path> is a directory (must be a file)")
+				return fmt.Errorf(`path "%s" is a directory (must be a file)`, path)
 			}
 
 			return nil

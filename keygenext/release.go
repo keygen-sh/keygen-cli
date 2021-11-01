@@ -2,6 +2,7 @@ package keygenext
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/keygen-sh/jsonapi-go"
 	"github.com/keygen-sh/keygen-go"
@@ -73,6 +74,29 @@ func (r *Release) Upsert() error {
 	if err != nil {
 		fmt.Printf("%v\n", res.Document.Errors[0])
 
+		return err
+	}
+
+	return nil
+}
+
+func (r *Release) Upload(file *os.File) error {
+	client := &keygen.Client{Account: Account, Token: Token}
+	artifact := &Artifact{}
+
+	fmt.Printf("%v\n", r)
+
+	res, err := client.Put("releases/"+r.ID+"/artifact", nil, artifact)
+	if err != nil {
+		fmt.Printf("%v\n", res.Document.Errors[0])
+
+		return err
+	}
+
+	artifact.Location = res.Headers.Get("Location")
+
+	err = artifact.Upload(file)
+	if err != nil {
 		return err
 	}
 

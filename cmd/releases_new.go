@@ -107,6 +107,11 @@ var (
 			fmt.Println(release.Upsert())
 			fmt.Println(release)
 
+			err = release.Upload(file)
+			if err != nil {
+				return err
+			}
+
 			return nil
 		},
 	}

@@ -15,7 +15,7 @@ type Release struct {
 	Version     string                 `json:"version"`
 	Filename    string                 `json:"filename"`
 	Filetype    string                 `json:"filetype"`
-	Filesize    int                    `json:"filesize"`
+	Filesize    int64                  `json:"filesize"`
 	Platform    string                 `json:"platform"`
 	Channel     string                 `json:"channel"`
 	Metadata    map[string]interface{} `json:"metadata"`

@@ -92,7 +92,7 @@ var (
 				Name:      name,
 				Version:   version.String(),
 				Filename:  filename,
-				Filesize:  int(filesize),
+				Filesize:  filesize,
 				Filetype:  filetype,
 				Platform:  platform,
 				Channel:   channel,

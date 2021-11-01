@@ -63,8 +63,12 @@ var (
 
 			channel := flags.channel
 			platform := flags.platform
-			name := flags.name
 			constraints := flags.constraints
+
+			var name *string
+			if n := flags.name; n != "" {
+				name = &n
+			}
 
 			// TODO(ezekg) Transform entitlement codes to entitlement IDs
 			// entitlements, err := getEntitlements(constraints)

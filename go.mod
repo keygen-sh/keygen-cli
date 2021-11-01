@@ -3,6 +3,7 @@ module github.com/keygen-sh/cli
 go 1.17
 
 require (
+	github.com/Masterminds/semver v1.5.0
 	github.com/keygen-sh/jsonapi-go v1.1.0
 	github.com/keygen-sh/keygen-go v1.7.10
 	github.com/mitchellh/go-homedir v1.0.0

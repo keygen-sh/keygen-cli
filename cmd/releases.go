@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/keygen-sh/cli/keygenext"
 	"github.com/spf13/cobra"
 )
 
@@ -12,11 +13,15 @@ var (
 )
 
 func init() {
-	flags := releasesCmd.PersistentFlags()
+	f := releasesCmd.PersistentFlags()
 
-	flags.StringP("account", "a", "", "Your keygen.sh account ID")
-	flags.StringP("product", "p", "", "Your keygen.sh product ID")
-	flags.StringP("token", "t", "", "Your keygen.sh product token")
+	f.StringVar(&keygenext.Account, "account", "", "your keygen.sh account ID (required)")
+	f.StringVar(&keygenext.Product, "product", "", "your keygen.sh product ID (required)")
+	f.StringVar(&keygenext.Token, "token", "", "your keygen.sh product token (required)")
+
+	releasesCmd.MarkPersistentFlagRequired("account")
+	releasesCmd.MarkPersistentFlagRequired("product")
+	releasesCmd.MarkPersistentFlagRequired("token")
 
 	rootCmd.AddCommand(releasesCmd)
 }

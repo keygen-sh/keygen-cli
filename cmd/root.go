@@ -14,8 +14,9 @@ const (
 
 var (
 	rootCmd = &cobra.Command{
-		Use:   "keygen",
-		Short: "CLI to interact with keygen.sh",
+		Use:     "keygen",
+		Short:   "CLI to interact with keygen.sh",
+		Version: Version,
 		CompletionOptions: cobra.CompletionOptions{
 			DisableDefaultCmd: true,
 		},

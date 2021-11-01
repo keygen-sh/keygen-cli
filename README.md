@@ -13,13 +13,9 @@ keygen releases list
 ```
 
 ```
-keygen releases delete <id>
+keygen releases del <id>
 ```
 
 ```
 keygen releases yank <id>
-```
-
-```
-keygen releases dl <id>
 ```

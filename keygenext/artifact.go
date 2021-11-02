@@ -1,7 +1,7 @@
 package keygenext
 
 import (
-	"bytes"
+	"bufio"
 	"errors"
 	"net/http"
 	"os"
@@ -10,12 +10,14 @@ import (
 
 // Artifact represents a Keygen artifact object.
 type Artifact struct {
-	ID       string    `json:"-"`
-	Type     string    `json:"-"`
-	Key      string    `json:"key"`
-	Created  time.Time `json:"created"`
-	Updated  time.Time `json:"updated"`
-	Location string    `json:"-"`
+	ID            string    `json:"-"`
+	Type          string    `json:"-"`
+	Key           string    `json:"key"`
+	Created       time.Time `json:"created"`
+	Updated       time.Time `json:"updated"`
+	Location      string    `json:"-"`
+	ContentLength int64     `json:"-"`
+	ContentType   string    `json:"-"`
 }
 
 func (a *Artifact) SetID(id string) error {
@@ -35,19 +37,14 @@ func (a *Artifact) SetData(to func(target interface{}) error) error {
 func (a *Artifact) Upload(file *os.File) error {
 	client := &http.Client{}
 
-	info, err := file.Stat()
+	req, err := http.NewRequest("PUT", a.Location, bufio.NewReader(file))
 	if err != nil {
 		return err
 	}
 
-	size := info.Size()
-	buffer := make([]byte, size)
-	file.Read(buffer)
-
-	req, err := http.NewRequest("PUT", a.Location, bytes.NewReader(buffer))
-	if err != nil {
-		return err
-	}
+	// This must be set otherwise the Go http package sends a Transfer-Encoding
+	// header, which S3 does not support.
+	req.ContentLength = a.ContentLength
 
 	res, err := client.Do(req)
 	if err != nil {

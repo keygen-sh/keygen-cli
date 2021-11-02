@@ -94,6 +94,7 @@ func (r *Release) Upload(file *os.File) error {
 		return err
 	}
 
+	artifact.ContentLength = r.Filesize
 	artifact.Location = res.Headers.Get("Location")
 
 	err = artifact.Upload(file)

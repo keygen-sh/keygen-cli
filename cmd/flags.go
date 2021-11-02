@@ -8,6 +8,7 @@ type Flags struct {
 	signature   string
 	checksum    string
 	constraints []string
+	signingKey  string
 }
 
 var (

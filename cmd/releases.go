@@ -13,11 +13,9 @@ var (
 )
 
 func init() {
-	f := releasesCmd.PersistentFlags()
-
-	f.StringVar(&keygenext.Account, "account", "", "your keygen.sh account ID (required)")
-	f.StringVar(&keygenext.Product, "product", "", "your keygen.sh product ID (required)")
-	f.StringVar(&keygenext.Token, "token", "", "your keygen.sh product token (required)")
+	releasesCmd.PersistentFlags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account ID (required)")
+	releasesCmd.PersistentFlags().StringVar(&keygenext.Product, "product", "", "your keygen.sh product ID (required)")
+	releasesCmd.PersistentFlags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product token (required)")
 
 	releasesCmd.MarkPersistentFlagRequired("account")
 	releasesCmd.MarkPersistentFlagRequired("product")

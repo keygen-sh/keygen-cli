@@ -10,12 +10,14 @@ var (
 	versionCmd = &cobra.Command{
 		Use:   "version",
 		Short: "Print the current CLI version",
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(Version)
-		},
+		Run:   versionRun,
 	}
 )
 
 func init() {
 	rootCmd.AddCommand(versionCmd)
+}
+
+func versionRun(cmd *cobra.Command, args []string) {
+	fmt.Println(Version)
 }

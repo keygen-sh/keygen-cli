@@ -86,7 +86,11 @@ func releasesNewRun(cmd *cobra.Command, args []string) error {
 
 	channel := flags.channel
 	platform := flags.platform
-	constraints := flags.constraints
+
+	constraints := keygenext.Constraints{}
+	if c := flags.constraints; len(c) != 0 {
+		constraints = constraints.From(c)
+	}
 
 	var name *string
 	if n := flags.name; n != "" {
@@ -115,21 +119,17 @@ func releasesNewRun(cmd *cobra.Command, args []string) error {
 	}
 
 	release := &keygenext.Release{
-		Name:      name,
-		Version:   version.String(),
-		Filename:  filename,
-		Filesize:  filesize,
-		Filetype:  filetype,
-		Platform:  platform,
-		Signature: signature,
-		Checksum:  checksum,
-		Channel:   channel,
-		ProductID: keygenext.Product,
-		Constraints: keygenext.Constraints{
-			{EntitlementID: constraints[0]},
-			{EntitlementID: constraints[1]},
-			{EntitlementID: constraints[2]},
-		},
+		Name:        name,
+		Version:     version.String(),
+		Filename:    filename,
+		Filesize:    filesize,
+		Filetype:    filetype,
+		Platform:    platform,
+		Signature:   signature,
+		Checksum:    checksum,
+		Channel:     channel,
+		ProductID:   keygenext.Product,
+		Constraints: constraints,
 	}
 
 	err = release.Upsert()

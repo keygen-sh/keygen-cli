@@ -40,3 +40,11 @@ type Constraints []Constraint
 func (c Constraints) GetData() interface{} {
 	return c
 }
+
+func (c Constraints) From(entitlements []string) Constraints {
+	for _, entitlement := range entitlements {
+		c = append(c, Constraint{EntitlementID: entitlement})
+	}
+
+	return c
+}

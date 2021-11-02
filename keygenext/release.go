@@ -1,6 +1,7 @@
 package keygenext
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/keygen-sh/jsonapi-go"
@@ -8,20 +9,21 @@ import (
 )
 
 type Release struct {
-	ID          string                 `json:"-"`
-	Type        string                 `json:"-"`
-	Name        *string                `json:"name"`
-	Version     string                 `json:"version"`
-	Filename    string                 `json:"filename"`
-	Filetype    string                 `json:"filetype"`
-	Filesize    int64                  `json:"filesize"`
-	Platform    string                 `json:"platform"`
-	Channel     string                 `json:"channel"`
-	Signature   *string                `json:"signature"`
-	Checksum    *string                `json:"checksum"`
-	Metadata    map[string]interface{} `json:"metadata"`
-	ProductID   string                 `json:"-"`
-	Constraints Constraints            `json:"-"`
+	ID           string                 `json:"-"`
+	Type         string                 `json:"-"`
+	Name         *string                `json:"name"`
+	Version      string                 `json:"version"`
+	Filename     string                 `json:"filename"`
+	Filetype     string                 `json:"filetype"`
+	Filesize     int64                  `json:"filesize"`
+	Platform     string                 `json:"platform"`
+	Channel      string                 `json:"channel"`
+	Signature    *string                `json:"signature"`
+	Checksum     *string                `json:"checksum"`
+	Metadata     map[string]interface{} `json:"metadata"`
+	ProductID    string                 `json:"-"`
+	Constraints  Constraints            `json:"-"`
+	NewlyCreated bool                   `json:"-"`
 }
 
 func (r *Release) SetID(id string) error {
@@ -70,11 +72,13 @@ func (r *Release) Upsert() error {
 		if len(res.Document.Errors) > 0 {
 			e := res.Document.Errors[0]
 
-			return &APIError{Title: e.Title, Detail: e.Detail, Code: e.Code, Err: err}
+			return &APIError{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}
 		}
 
 		return err
 	}
+
+	r.NewlyCreated = res.Status == http.StatusCreated
 
 	return nil
 }
@@ -88,7 +92,7 @@ func (r *Release) Upload(file *os.File) error {
 		if len(res.Document.Errors) > 0 {
 			e := res.Document.Errors[0]
 
-			return &APIError{Title: e.Title, Detail: e.Detail, Code: e.Code, Err: err}
+			return &APIError{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}
 		}
 
 		return err

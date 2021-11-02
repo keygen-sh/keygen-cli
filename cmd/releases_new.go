@@ -144,10 +144,20 @@ func releasesNewRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	if release.NewlyCreated {
+		fmt.Printf("successfully created release \"%s\"\n", release.ID)
+	} else {
+		fmt.Printf("successfully replaced release \"%s\"\n", release.ID)
+	}
+
+	fmt.Printf("uploading artifact... ")
+
 	err = release.Upload(file)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("done.")
 
 	return nil
 }

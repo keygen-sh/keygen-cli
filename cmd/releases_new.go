@@ -23,8 +23,9 @@ var (
 )
 
 func init() {
+	releasesNewCmd.Flags().StringVar(&flags.filename, "filename", "", "filename for the release (default is filename from <path>)")
 	releasesNewCmd.Flags().StringVar(&flags.version, "version", "", "version for the release (required)")
-	releasesNewCmd.Flags().StringVar(&flags.name, "name", "", "name for the release")
+	releasesNewCmd.Flags().StringVar(&flags.name, "name", "", "human-readable name for the release")
 	releasesNewCmd.Flags().StringVar(&flags.platform, "platform", "", "platform for the release (required)")
 	releasesNewCmd.Flags().StringVar(&flags.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
 	releasesNewCmd.Flags().StringVar(&flags.signature, "signature", "", "precalculated signature for the release (release will be signed using ed25519 by default)")
@@ -82,6 +83,11 @@ func releasesNewRun(cmd *cobra.Command, args []string) error {
 	filetype := filepath.Ext(filename)
 	if filetype == "" {
 		filetype = "bin"
+	}
+
+	// Allow filename to be overridden
+	if n := flags.filename; n != "" {
+		filename = n
 	}
 
 	channel := flags.channel

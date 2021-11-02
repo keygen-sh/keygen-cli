@@ -1,6 +1,7 @@
 package cmd
 
 type Flags struct {
+	filename    string
 	name        string
 	version     string
 	platform    string

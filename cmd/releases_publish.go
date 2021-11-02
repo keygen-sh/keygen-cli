@@ -6,9 +6,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/Masterminds/semver"
-	"github.com/keygen-sh/cli/keygenext"
+	"github.com/briandowns/spinner"
+	"github.com/keygen-sh/keygen-cli/keygenext"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
@@ -69,6 +71,10 @@ func releasesPublishArgs(cmd *cobra.Command, args []string) error {
 }
 
 func releasesPublishRun(cmd *cobra.Command, args []string) error {
+	s := spinner.New(spinner.CharSets[13], 100*time.Millisecond)
+	s.HideCursor = true
+	s.Start()
+
 	path := args[0]
 	file, err := os.Open(args[0])
 	if err != nil {
@@ -117,12 +123,19 @@ func releasesPublishRun(cmd *cobra.Command, args []string) error {
 	}
 
 	if key := flags.signingKey; signature == nil && key != "" {
+		s.Suffix = " generating signature for release..."
+
+		time.Sleep(2 * time.Second)
 		// TODO(ezekg) Sign release
+		// sig := ed25519.Sign(key, file)
 	}
 
 	var checksum *string
 	if c := flags.checksum; c == "" {
 		// TODO(ezekg) Hash release
+		s.Suffix = " generating checksum for release..."
+
+		time.Sleep(2 * time.Second)
 	} else {
 		checksum = &c
 	}
@@ -142,17 +155,23 @@ func releasesPublishRun(cmd *cobra.Command, args []string) error {
 	}
 
 	// TODO(ezekg) Should we do a Create() unless a --upsert flag is given?
-	err = release.Upsert()
-	if err != nil {
+	s.Suffix = " creating release object..."
+
+	if err := release.Upsert(); err != nil {
 		return err
 	}
 
-	err = release.Upload(file)
-	if err != nil {
+	s.Suffix = " uploading release artifact..."
+
+	if err := release.Upload(file); err != nil {
 		return err
 	}
 
-	fmt.Println(`successfully published release "` + release.ID + `"`)
+	time.Sleep(2 * time.Second)
+
+	s.Suffix = ""
+	s.FinalMSG = "successfully published release \"" + release.ID + "\"\n"
+	s.Stop()
 
 	return nil
 }

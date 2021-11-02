@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/keygen-sh/cli/keygenext"
+	"github.com/keygen-sh/keygen-cli/keygenext"
 	"github.com/spf13/cobra"
 )
 

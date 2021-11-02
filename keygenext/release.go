@@ -1,7 +1,6 @@
 package keygenext
 
 import (
-	"net/http"
 	"os"
 
 	"github.com/keygen-sh/jsonapi-go"
@@ -9,21 +8,20 @@ import (
 )
 
 type Release struct {
-	ID           string                 `json:"-"`
-	Type         string                 `json:"-"`
-	Name         *string                `json:"name"`
-	Version      string                 `json:"version"`
-	Filename     string                 `json:"filename"`
-	Filetype     string                 `json:"filetype"`
-	Filesize     int64                  `json:"filesize"`
-	Platform     string                 `json:"platform"`
-	Channel      string                 `json:"channel"`
-	Signature    *string                `json:"signature"`
-	Checksum     *string                `json:"checksum"`
-	Metadata     map[string]interface{} `json:"metadata"`
-	ProductID    string                 `json:"-"`
-	Constraints  Constraints            `json:"-"`
-	NewlyCreated bool                   `json:"-"`
+	ID          string                 `json:"-"`
+	Type        string                 `json:"-"`
+	Name        *string                `json:"name"`
+	Version     string                 `json:"version"`
+	Filename    string                 `json:"filename"`
+	Filetype    string                 `json:"filetype"`
+	Filesize    int64                  `json:"filesize"`
+	Platform    string                 `json:"platform"`
+	Channel     string                 `json:"channel"`
+	Signature   *string                `json:"signature"`
+	Checksum    *string                `json:"checksum"`
+	Metadata    map[string]interface{} `json:"metadata"`
+	ProductID   string                 `json:"-"`
+	Constraints Constraints            `json:"-"`
 }
 
 func (r *Release) SetID(id string) error {
@@ -77,8 +75,6 @@ func (r *Release) Upsert() error {
 
 		return err
 	}
-
-	r.NewlyCreated = res.Status == http.StatusCreated
 
 	return nil
 }

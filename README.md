@@ -5,11 +5,7 @@ keygen genkey
 ```
 
 ```
-keygen releases new
-```
-
-```
-keygen releases list
+keygen releases publish
 ```
 
 ```

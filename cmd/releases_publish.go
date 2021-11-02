@@ -14,36 +14,39 @@ import (
 )
 
 var (
-	releasesNewCmd = &cobra.Command{
-		Use:   "new <path>",
+	releasesPublishCmd = &cobra.Command{
+		Use:   "publish <path>",
 		Short: "Publish a new release for a product",
-		Args:  releasesNewArgs,
-		RunE:  releasesNewRun,
+		Args:  releasesPublishArgs,
+		RunE:  releasesPublishRun,
+
+		// Encountering an error should not display usage
+		SilenceUsage: true,
 	}
 )
 
 func init() {
-	releasesNewCmd.Flags().StringVar(&flags.filename, "filename", "", "filename for the release (default is filename from <path>)")
-	releasesNewCmd.Flags().StringVar(&flags.version, "version", "", "version for the release (required)")
-	releasesNewCmd.Flags().StringVar(&flags.name, "name", "", "human-readable name for the release")
-	releasesNewCmd.Flags().StringVar(&flags.platform, "platform", "", "platform for the release (required)")
-	releasesNewCmd.Flags().StringVar(&flags.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
-	releasesNewCmd.Flags().StringVar(&flags.signature, "signature", "", "precalculated signature for the release (release will be signed using ed25519 by default)")
-	releasesNewCmd.Flags().StringVar(&flags.checksum, "checksum", "", "precalculated checksum for the release (release will be hashed using sha-256 by default)")
-	releasesNewCmd.Flags().StringVar(&flags.signingKey, "signing-key", "", "path to the ed25519 private key for signing releases")
+	releasesPublishCmd.Flags().StringVar(&flags.filename, "filename", "", "filename for the release (default is filename from <path>)")
+	releasesPublishCmd.Flags().StringVar(&flags.version, "version", "", "version for the release (required)")
+	releasesPublishCmd.Flags().StringVar(&flags.name, "name", "", "human-readable name for the release")
+	releasesPublishCmd.Flags().StringVar(&flags.platform, "platform", "", "platform for the release (required)")
+	releasesPublishCmd.Flags().StringVar(&flags.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
+	releasesPublishCmd.Flags().StringVar(&flags.signature, "signature", "", "precalculated signature for the release (release will be signed using ed25519 by default)")
+	releasesPublishCmd.Flags().StringVar(&flags.checksum, "checksum", "", "precalculated checksum for the release (release will be hashed using sha-256 by default)")
+	releasesPublishCmd.Flags().StringVar(&flags.signingKey, "signing-key", "", "path to the ed25519 private key for signing releases")
 
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
-	releasesNewCmd.Flags().StringSliceVar(&flags.constraints, "constraints", []string{}, "comma seperated list of entitlement identifiers (e.g. --constraints <id>,<id>,...)")
+	releasesPublishCmd.Flags().StringSliceVar(&flags.constraints, "constraints", []string{}, "comma seperated list of entitlement identifiers (e.g. --constraints <id>,<id>,...)")
 
 	// TODO(ezekg) Add metadata flag
 
-	releasesNewCmd.MarkFlagRequired("version")
-	releasesNewCmd.MarkFlagRequired("platform")
+	releasesPublishCmd.MarkFlagRequired("version")
+	releasesPublishCmd.MarkFlagRequired("platform")
 
-	releasesCmd.AddCommand(releasesNewCmd)
+	releasesCmd.AddCommand(releasesPublishCmd)
 }
 
-func releasesNewArgs(cmd *cobra.Command, args []string) error {
+func releasesPublishArgs(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
 		return errors.New("path to file is required")
 	}
@@ -65,7 +68,7 @@ func releasesNewArgs(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func releasesNewRun(cmd *cobra.Command, args []string) error {
+func releasesPublishRun(cmd *cobra.Command, args []string) error {
 	path := args[0]
 	file, err := os.Open(args[0])
 	if err != nil {
@@ -144,20 +147,12 @@ func releasesNewRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	if release.NewlyCreated {
-		fmt.Printf("successfully created release \"%s\"\n", release.ID)
-	} else {
-		fmt.Printf("successfully replaced release \"%s\"\n", release.ID)
-	}
-
-	fmt.Printf("uploading artifact... ")
-
 	err = release.Upload(file)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("done.")
+	fmt.Println(`successfully published release "` + release.ID + `"`)
 
 	return nil
 }

@@ -27,12 +27,12 @@ func init() {
 	releasesNewCmd.Flags().StringVar(&flags.name, "name", "", "name for the release")
 	releasesNewCmd.Flags().StringVar(&flags.platform, "platform", "", "platform for the release (required)")
 	releasesNewCmd.Flags().StringVar(&flags.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
-	releasesNewCmd.Flags().StringVar(&flags.signature, "signature", "", "precalculated signature for the release (will be signed using ed25519 by default)")
-	releasesNewCmd.Flags().StringVar(&flags.checksum, "checksum", "", "precalculated checksum for the release (will be hashed using sha-512 by default)")
+	releasesNewCmd.Flags().StringVar(&flags.signature, "signature", "", "precalculated signature for the release (release will be signed using ed25519 by default)")
+	releasesNewCmd.Flags().StringVar(&flags.checksum, "checksum", "", "precalculated checksum for the release (release will be hashed using sha-256 by default)")
 	releasesNewCmd.Flags().StringVar(&flags.signingKey, "signing-key", "", "path to the ed25519 private key for signing releases")
 
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
-	releasesNewCmd.Flags().StringSliceVar(&flags.constraints, "constraints", []string{}, "comma seperated list of entitlement IDs (e.g. --constraints <id>,<id>,...)")
+	releasesNewCmd.Flags().StringSliceVar(&flags.constraints, "constraints", []string{}, "comma seperated list of entitlement identifiers (e.g. --constraints <id>,<id>,...)")
 
 	// TODO(ezekg) Add metadata flag
 

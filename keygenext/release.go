@@ -67,9 +67,13 @@ func (r *Release) Upsert() error {
 
 	res, err := client.Put("releases", r, r)
 	if err != nil {
-		e := res.Document.Errors[0]
+		if len(res.Document.Errors) > 0 {
+			e := res.Document.Errors[0]
 
-		return &APIError{Title: e.Title, Detail: e.Detail, Code: e.Code, Err: err}
+			return &APIError{Title: e.Title, Detail: e.Detail, Code: e.Code, Err: err}
+		}
+
+		return err
 	}
 
 	return nil
@@ -81,9 +85,13 @@ func (r *Release) Upload(file *os.File) error {
 
 	res, err := client.Put("releases/"+r.ID+"/artifact", nil, artifact)
 	if err != nil {
-		e := res.Document.Errors[0]
+		if len(res.Document.Errors) > 0 {
+			e := res.Document.Errors[0]
 
-		return &APIError{Title: e.Title, Detail: e.Detail, Code: e.Code, Err: err}
+			return &APIError{Title: e.Title, Detail: e.Detail, Code: e.Code, Err: err}
+		}
+
+		return err
 	}
 
 	artifact.Location = res.Headers.Get("Location")

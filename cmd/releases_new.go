@@ -132,6 +132,7 @@ func releasesNewRun(cmd *cobra.Command, args []string) error {
 		Constraints: constraints,
 	}
 
+	// TODO(ezekg) Should we do a Create() unless a --upsert flag is given?
 	err = release.Upsert()
 	if err != nil {
 		return err

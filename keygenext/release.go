@@ -1,7 +1,6 @@
 package keygenext
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/keygen-sh/jsonapi-go"
@@ -64,19 +63,14 @@ func (r Release) GetRelationships() map[string]interface{} {
 }
 
 func (r *Release) Upsert() error {
-	// TODO(ezekg) Add custom user agent
-	logger := keygen.Logger.(*keygen.LeveledLogger)
-	logger.Level = keygen.LogLevelDebug
-
 	client := &keygen.Client{Account: Account, Token: Token}
-
-	fmt.Printf("%v\n", r)
 
 	res, err := client.Put("releases", r, r)
 	if err != nil {
-		fmt.Printf("%v\n", res.Document.Errors[0])
+		docErr := res.Document.Errors[0]
+		apiErr := &APIError{Title: docErr.Title, Detail: docErr.Detail, Code: docErr.Code, Err: err}
 
-		return err
+		return apiErr
 	}
 
 	return nil
@@ -86,13 +80,12 @@ func (r *Release) Upload(file *os.File) error {
 	client := &keygen.Client{Account: Account, Token: Token}
 	artifact := &Artifact{}
 
-	fmt.Printf("%v\n", r)
-
 	res, err := client.Put("releases/"+r.ID+"/artifact", nil, artifact)
 	if err != nil {
-		fmt.Printf("%v\n", res.Document.Errors[0])
+		docErr := res.Document.Errors[0]
+		apiErr := &APIError{Title: docErr.Title, Detail: docErr.Detail, Code: docErr.Code, Err: err}
 
-		return err
+		return apiErr
 	}
 
 	artifact.Location = res.Headers.Get("Location")

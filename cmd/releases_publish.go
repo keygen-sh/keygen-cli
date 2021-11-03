@@ -196,9 +196,10 @@ func calculateSignature(signingKey string, file *os.File) (string, error) {
 		return "", err
 	}
 
+	// We're using Ed25519ph which expects a pre-hashed message using SHA-512
 	h := sha512.New()
-	_, err = io.Copy(h, file)
-	if err != nil {
+
+	if _, err = io.Copy(h, file); err != nil {
 		return "", err
 	}
 

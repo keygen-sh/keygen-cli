@@ -8,6 +8,8 @@ type Flags struct {
 	channel     string
 	constraints []string
 	signingKey  string
+	privateKey  string
+	publicKey   string
 }
 
 var (

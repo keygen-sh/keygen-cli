@@ -6,6 +6,9 @@ import (
 	"github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
 )
 
+type PrivateKey = ed25519.PrivateKey
+type PublicKey = ed25519.PublicKey
+
 func GenerateKey() (ed25519.PublicKey, ed25519.PrivateKey, error) {
 	return ed25519.GenerateKey(nil)
 }

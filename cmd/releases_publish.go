@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bufio"
-	"crypto"
 	"crypto/sha512"
 	"encoding/hex"
 	"errors"
@@ -13,9 +12,9 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver"
+	"github.com/keygen-sh/keygen-cli/ed25519ph"
 	"github.com/keygen-sh/keygen-cli/keygenext"
 	"github.com/mitchellh/go-homedir"
-	ed25519ph "github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
 	"github.com/spf13/cobra"
 )
 
@@ -192,32 +191,31 @@ func calculateChecksum(file *os.File) (string, error) {
 func calculateSignature(signingKey string, file *os.File) (string, error) {
 	defer file.Seek(0, io.SeekStart) // reset reader
 
-	seed, err := hex.DecodeString(signingKey)
+	priv, err := hex.DecodeString(signingKey)
 	if err != nil {
 		return "", err
 	}
 
-	// TODO(ezekg) Validate key size to guard against Sign panicing
-	key := ed25519ph.NewKeyFromSeed(seed)
 	h := sha512.New()
-
 	_, err = io.Copy(h, file)
 	if err != nil {
 		return "", err
 	}
 
-	sum := h.Sum(nil)
-	sig, err := key.Sign(nil, sum, &ed25519ph.Options{Hash: crypto.SHA512})
+	digest := h.Sum(nil)
+
+	// TODO(ezekg) Validate key size to guard against Sign panicing
+	sig, err := ed25519ph.Sign(priv, digest)
 	if err != nil {
 		return "", err
 	}
 
-	// if s := "c7eff0a9b8dd0c9c0cf23ce1a53554be7a82581e453c01ea6b10557b4c6f7b7a"; s != "" {
-	// 	pub, _ := hex.DecodeString(s)
-	// 	ok := ed25519ph.VerifyWithOptions(pub, sum, sig, &ed25519ph.Options{Hash: crypto.SHA512})
+	if s := "c7eff0a9b8dd0c9c0cf23ce1a53554be7a82581e453c01ea6b10557b4c6f7b7a"; s != "" {
+		pub, _ := hex.DecodeString(s)
+		ok := ed25519ph.Verify(pub, digest, sig)
 
-	// 	fmt.Printf("ok: %v\n", ok)
-	// }
+		fmt.Printf("ok: %v\n", ok)
+	}
 
 	return hex.EncodeToString(sig), nil
 }

@@ -78,7 +78,7 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 }
 
 func writesigningKeyFile(signingKeyPath string, signingKey ed25519ph.SigningKey) error {
-	file, err := os.Create(signingKeyPath)
+	file, err := os.OpenFile(signingKeyPath, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ func writesigningKeyFile(signingKeyPath string, signingKey ed25519ph.SigningKey)
 }
 
 func writeverifyKeyFile(verifyKeyPath string, verifyKey ed25519ph.VerifyKey) error {
-	file, err := os.Create(verifyKeyPath)
+	file, err := os.OpenFile(verifyKeyPath, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		return err
 	}

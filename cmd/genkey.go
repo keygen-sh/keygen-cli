@@ -24,8 +24,8 @@ var (
 )
 
 func init() {
-	genkeyCmd.Flags().StringVar(&genkeyOpts.signingKey, "signing-key", "keygen.key", "write private signing key to file")
-	genkeyCmd.Flags().StringVar(&genkeyOpts.verifyKey, "verify-key", "keygen.pub", "write public verify key to file")
+	genkeyCmd.Flags().StringVar(&genkeyOpts.signingKey, "private-key", "keygen.key", "write private signing key to file")
+	genkeyCmd.Flags().StringVar(&genkeyOpts.verifyKey, "public-key", "keygen.pub", "write public verify key to file")
 
 	rootCmd.AddCommand(genkeyCmd)
 }

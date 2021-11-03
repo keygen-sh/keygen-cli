@@ -8,7 +8,7 @@ app. **Never share your private key.**
 
 For more usage options run `keygen genkey --help`.
 
-```
+```sh
 keygen genkey
 ```
 
@@ -21,6 +21,12 @@ In addition, a SHA-512 checksum will be generated for the release.
 
 For more usage options run `keygen releases publish --help`.
 
-```
-keygen releases publish <path>
+```sh
+keygen releases publish dist/App-1-0-0.zip \
+  --signing-key ./keygen.key \
+  --account '1fddcec8-8dd3-4d8d-9b16-215cac0f9b52' \
+  --product '2313b7e7-1ea6-4a01-901e-2931de6bb1e2' \
+  --token 'prod-xxx' \
+  --platform 'darwin' \
+  --version '1.0.0'
 ```

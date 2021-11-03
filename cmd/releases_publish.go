@@ -210,12 +210,5 @@ func calculateSignature(signingKey string, file *os.File) (string, error) {
 		return "", err
 	}
 
-	if s := "c7eff0a9b8dd0c9c0cf23ce1a53554be7a82581e453c01ea6b10557b4c6f7b7a"; s != "" {
-		pub, _ := hex.DecodeString(s)
-		ok := ed25519ph.Verify(pub, digest, sig)
-
-		fmt.Printf("ok: %v\n", ok)
-	}
-
 	return hex.EncodeToString(sig), nil
 }

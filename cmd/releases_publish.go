@@ -2,8 +2,7 @@ package cmd
 
 import (
 	"bufio"
-	"bytes"
-	"crypto/ed25519"
+	"crypto"
 	"crypto/sha512"
 	"encoding/hex"
 	"errors"
@@ -16,6 +15,7 @@ import (
 	"github.com/Masterminds/semver"
 	"github.com/keygen-sh/keygen-cli/keygenext"
 	"github.com/mitchellh/go-homedir"
+	ed25519ph "github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
 	"github.com/spf13/cobra"
 )
 
@@ -198,28 +198,23 @@ func calculateSignature(signingKey string, file *os.File) (string, error) {
 	}
 
 	// TODO(ezekg) Validate key size to guard against Sign panicing
-	key := ed25519.NewKeyFromSeed(seed)
+	key := ed25519ph.NewKeyFromSeed(seed)
+	h := sha512.New()
 
-	// FIXME(ezekg) Should we hash with SHA-512 beforehand to optimize sigs
-	//              of large files?
-	// h := sha512.New()
+	_, err = io.Copy(h, file)
+	if err != nil {
+		return "", err
+	}
 
-	// _, err = io.Copy(h, file)
-	// if err != nil {
-	// 	return "", err
-	// }
-
-	// sum := h.Sum(nil)
-	// sig := ed25519.Sign(key, sum)
-
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(file)
-
-	sig := ed25519.Sign(key, buf.Bytes())
+	sum := h.Sum(nil)
+	sig, err := key.Sign(nil, sum, &ed25519ph.Options{Hash: crypto.SHA512})
+	if err != nil {
+		return "", err
+	}
 
 	// if s := "c7eff0a9b8dd0c9c0cf23ce1a53554be7a82581e453c01ea6b10557b4c6f7b7a"; s != "" {
 	// 	pub, _ := hex.DecodeString(s)
-	// 	ok := ed25519.Verify(pub, buf.Bytes(), sig)
+	// 	ok := ed25519ph.VerifyWithOptions(pub, sum, sig, &ed25519ph.Options{Hash: crypto.SHA512})
 
 	// 	fmt.Printf("ok: %v\n", ok)
 	// }

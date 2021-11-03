@@ -15,7 +15,7 @@ var (
 	genkeyOpts = &CommandOptions{}
 	genkeyCmd  = &cobra.Command{
 		Use:   "genkey",
-		Short: "generate an ed25519 keypair for code signing",
+		Short: "generate an ed25519 key pair for code signing",
 		RunE:  genkeyRun,
 
 		// Encountering an error should not display usage

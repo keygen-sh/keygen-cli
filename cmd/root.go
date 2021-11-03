@@ -12,6 +12,7 @@ const (
 )
 
 var (
+	options = &CommandOptions{}
 	rootCmd = &cobra.Command{
 		Use:     "keygen",
 		Short:   "CLI to interact with keygen.sh",
@@ -21,6 +22,17 @@ var (
 		},
 	}
 )
+
+type CommandOptions struct {
+	filename    string
+	name        string
+	version     string
+	platform    string
+	channel     string
+	constraints []string
+	privateKey  string
+	publicKey   string
+}
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {

@@ -31,15 +31,15 @@ var (
 )
 
 func init() {
-	releasesPublishCmd.Flags().StringVar(&flags.filename, "filename", "", "filename for the release (default is filename from <path>)")
-	releasesPublishCmd.Flags().StringVar(&flags.version, "version", "", "version for the release (required)")
-	releasesPublishCmd.Flags().StringVar(&flags.name, "name", "", "human-readable name for the release")
-	releasesPublishCmd.Flags().StringVar(&flags.platform, "platform", "", "platform for the release (required)")
-	releasesPublishCmd.Flags().StringVar(&flags.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
-	releasesPublishCmd.Flags().StringVar(&flags.signingKey, "signing-key", "", "hex-encoded ed25519 private key for signing releases")
+	releasesPublishCmd.Flags().StringVar(&options.filename, "filename", "", "filename for the release (default is filename from <path>)")
+	releasesPublishCmd.Flags().StringVar(&options.version, "version", "", "version for the release (required)")
+	releasesPublishCmd.Flags().StringVar(&options.name, "name", "", "human-readable name for the release")
+	releasesPublishCmd.Flags().StringVar(&options.platform, "platform", "", "platform for the release (required)")
+	releasesPublishCmd.Flags().StringVar(&options.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
+	releasesPublishCmd.Flags().StringVar(&options.privateKey, "signing-key", "", "path to ed25519 private key for signing releases")
 
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
-	releasesPublishCmd.Flags().StringSliceVar(&flags.constraints, "constraints", []string{}, "comma seperated list of entitlement identifiers (e.g. --constraints <id>,<id>,...)")
+	releasesPublishCmd.Flags().StringSliceVar(&options.constraints, "constraints", []string{}, "comma seperated list of entitlement identifiers (e.g. --constraints <id>,<id>,...)")
 
 	// TODO(ezekg) Add metadata flag
 
@@ -54,20 +54,6 @@ func releasesPublishArgs(cmd *cobra.Command, args []string) error {
 		return errors.New("path to file is required")
 	}
 
-	path, err := homedir.Expand(args[0])
-	if err != nil {
-		return fmt.Errorf(`path "%s" is not expandable (%s)`, args[0], err)
-	}
-
-	info, err := os.Stat(path)
-	if err != nil {
-		return fmt.Errorf(`path "%s" is not readable (%s)`, path, err.(*os.PathError).Err)
-	}
-
-	if info.IsDir() {
-		return fmt.Errorf(`path "%s" is a directory (must be a file)`, path)
-	}
-
 	return nil
 }
 
@@ -76,7 +62,11 @@ func releasesPublishRun(cmd *cobra.Command, args []string) error {
 	// s.HideCursor = true
 	// s.Start()
 
-	path := args[0]
+	path, err := homedir.Expand(args[0])
+	if err != nil {
+		return fmt.Errorf(`path "%s" is not expandable (%s)`, args[0], err)
+	}
+
 	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf(`path "%s" is not readable (%s)`, path, err.(*os.PathError).Err)
@@ -88,6 +78,10 @@ func releasesPublishRun(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf(`path "%s" is not readable (%s)`, path, err.(*os.PathError).Err)
 	}
 
+	if info.IsDir() {
+		return fmt.Errorf(`path "%s" is a directory (must be a file)`, path)
+	}
+
 	filename := file.Name()
 	filesize := info.Size()
 	filetype := filepath.Ext(filename)
@@ -96,26 +90,26 @@ func releasesPublishRun(cmd *cobra.Command, args []string) error {
 	}
 
 	// Allow filename to be overridden
-	if n := flags.filename; n != "" {
+	if n := options.filename; n != "" {
 		filename = n
 	}
 
-	channel := flags.channel
-	platform := flags.platform
+	channel := options.channel
+	platform := options.platform
 
 	constraints := keygenext.Constraints{}
-	if c := flags.constraints; len(c) != 0 {
+	if c := options.constraints; len(c) != 0 {
 		constraints = constraints.From(c)
 	}
 
 	var name *string
-	if n := flags.name; n != "" {
+	if n := options.name; n != "" {
 		name = &n
 	}
 
-	version, err := semver.NewVersion(flags.version)
+	version, err := semver.NewVersion(options.version)
 	if err != nil {
-		return fmt.Errorf(`version "%s" is not acceptable (%s)`, flags.version, strings.ToLower(err.Error()))
+		return fmt.Errorf(`version "%s" is not acceptable (%s)`, options.version, strings.ToLower(err.Error()))
 	}
 
 	// s.Suffix = " generating checksum for release..."
@@ -127,10 +121,15 @@ func releasesPublishRun(cmd *cobra.Command, args []string) error {
 	}
 
 	var signature *string
-	if sk := flags.signingKey; sk != "" {
+	if pk := options.privateKey; pk != "" {
 		// s.Suffix = " generating signature for release..."
 
-		sig, err := calculateSignature(sk, file)
+		path, err := homedir.Expand(pk)
+		if err != nil {
+			return fmt.Errorf(`private-key "%s" is not expandable (%s)`, pk, err)
+		}
+
+		sig, err := calculateSignature(path, file)
 		if err != nil {
 			return err
 		}
@@ -188,11 +187,16 @@ func calculateChecksum(file *os.File) (string, error) {
 	return hex.EncodeToString(shasum), nil
 }
 
-func calculateSignature(signingKey string, file *os.File) (string, error) {
+func calculateSignature(privateKeyPath string, file *os.File) (string, error) {
 	defer file.Seek(0, io.SeekStart) // reset reader
 
-	priv, err := hex.DecodeString(signingKey)
+	privateKey := make(ed25519ph.PrivateKey, ed25519ph.PrivateKeySize)
+	encKey, err := os.ReadFile(privateKeyPath)
 	if err != nil {
+		return "", err
+	}
+
+	if _, err := hex.Decode(privateKey, encKey); err != nil {
 		return "", err
 	}
 
@@ -206,7 +210,7 @@ func calculateSignature(signingKey string, file *os.File) (string, error) {
 	digest := h.Sum(nil)
 
 	// TODO(ezekg) Validate key size to guard against Sign panicing
-	sig, err := ed25519ph.Sign(priv, digest)
+	sig, err := ed25519ph.Sign(privateKey, digest)
 	if err != nil {
 		return "", err
 	}

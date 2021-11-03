@@ -6,14 +6,14 @@ import (
 	"os"
 
 	"github.com/keygen-sh/keygen-cli/internal/ed25519ph"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
 
 var (
 	genkeyCmd = &cobra.Command{
 		Use:   "genkey",
-		Short: "generate an Ed25519 keypair for code signing",
-		Args:  genkeyArgs,
+		Short: "generate an ed25519 keypair for code signing",
 		RunE:  genkeyRun,
 
 		// Encountering an error should not display usage
@@ -22,43 +22,49 @@ var (
 )
 
 func init() {
-	genkeyCmd.Flags().StringVar(&flags.privateKey, "private-key", "keygen.key", "write private key to this file")
-	genkeyCmd.Flags().StringVar(&flags.publicKey, "public-key", "keygen.pub", "write public key to this file")
+	genkeyCmd.Flags().StringVar(&options.privateKey, "private-key", "keygen.key", "write private key to file (e.g. --private-key ~/keygen.key)")
+	genkeyCmd.Flags().StringVar(&options.publicKey, "public-key", "keygen.pub", "write public key to file (e.g. --public-key ~/keygen.pub)")
 
 	rootCmd.AddCommand(genkeyCmd)
 }
 
-func genkeyArgs(cmd *cobra.Command, args []string) error {
-	if _, err := os.Stat(flags.privateKey); err == nil {
-		return fmt.Errorf(`private key file "%s" already exists`, flags.privateKey)
-	}
-
-	if _, err := os.Stat(flags.publicKey); err == nil {
-		return fmt.Errorf(`public key file "%s" already exists`, flags.publicKey)
-	}
-
-	return nil
-}
-
 func genkeyRun(cmd *cobra.Command, args []string) error {
-	pub, priv, err := ed25519ph.GenerateKey()
+	privateKeyPath, err := homedir.Expand(options.privateKey)
+	if err != nil {
+		return fmt.Errorf(`path "%s" is not expandable (%s)`, options.privateKey, err)
+	}
+
+	publicKeyPath, err := homedir.Expand(options.publicKey)
+	if err != nil {
+		return fmt.Errorf(`path "%s" is not expandable (%s)`, options.publicKey, err)
+	}
+
+	if _, err := os.Stat(privateKeyPath); err == nil {
+		return fmt.Errorf(`private key file "%s" already exists`, privateKeyPath)
+	}
+
+	if _, err := os.Stat(publicKeyPath); err == nil {
+		return fmt.Errorf(`public key file "%s" already exists`, publicKeyPath)
+	}
+
+	publicKey, privateKey, err := ed25519ph.GenerateKey()
 	if err != nil {
 		return err
 	}
 
-	if err := writePrivateKeyFile(priv); err != nil {
+	if err := writePrivateKeyFile(privateKeyPath, privateKey); err != nil {
 		return err
 	}
 
-	if err := writePublicKeyFile(pub); err != nil {
+	if err := writePublicKeyFile(publicKeyPath, publicKey); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func writePrivateKeyFile(privateKey ed25519ph.PrivateKey) error {
-	file, err := os.Create(flags.privateKey)
+func writePrivateKeyFile(path string, privateKey ed25519ph.PrivateKey) error {
+	file, err := os.Create(path)
 	if err != nil {
 		return err
 	}
@@ -73,8 +79,8 @@ func writePrivateKeyFile(privateKey ed25519ph.PrivateKey) error {
 	return nil
 }
 
-func writePublicKeyFile(publicKey ed25519ph.PublicKey) error {
-	file, err := os.Create(flags.publicKey)
+func writePublicKeyFile(path string, publicKey ed25519ph.PublicKey) error {
+	file, err := os.Create(path)
 	if err != nil {
 		return err
 	}

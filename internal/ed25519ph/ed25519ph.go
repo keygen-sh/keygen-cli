@@ -6,6 +6,12 @@ import (
 	"github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
 )
 
+const (
+	PublicKeySize  = ed25519.PublicKeySize
+	PrivateKeySize = ed25519.PrivateKeySize
+	SignatureSize  = ed25519.SignatureSize
+)
+
 type PrivateKey = ed25519.PrivateKey
 type PublicKey = ed25519.PublicKey
 

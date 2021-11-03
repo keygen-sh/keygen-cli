@@ -19,10 +19,10 @@ func GenerateKey() (VerifyKey, SigningKey, error) {
 	return ed25519.GenerateKey(nil)
 }
 
-func Sign(privateKey SigningKey, digest []byte) ([]byte, error) {
-	return privateKey.Sign(nil, digest, &ed25519.Options{Hash: crypto.SHA512})
+func Sign(key SigningKey, digest []byte) ([]byte, error) {
+	return key.Sign(nil, digest, &ed25519.Options{Hash: crypto.SHA512})
 }
 
-func Verify(publicKey VerifyKey, digest []byte, sig []byte) bool {
-	return ed25519.VerifyWithOptions(publicKey, digest, sig, &ed25519.Options{Hash: crypto.SHA512})
+func Verify(key VerifyKey, digest []byte, sig []byte) bool {
+	return ed25519.VerifyWithOptions(key, digest, sig, &ed25519.Options{Hash: crypto.SHA512})
 }

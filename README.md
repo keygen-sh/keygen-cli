@@ -23,7 +23,7 @@ upload the file at `<path>` to the release's artifact relationship. When the
 In addition, a SHA-512 checksum will be generated for the release.
 
 ```sh
-keygen releases publish dist/App-1-0-0.zip \
+keygen dist build/App-1-0-0.zip \
   --signing-key ~/.keys/keygen.key \
   --account '1fddcec8-8dd3-4d8d-9b16-215cac0f9b52' \
   --product '2313b7e7-1ea6-4a01-901e-2931de6bb1e2' \
@@ -32,4 +32,4 @@ keygen releases publish dist/App-1-0-0.zip \
   --version '1.0.0'
 ```
 
-For more usage options run `keygen releases publish --help`.
+For more usage options run `keygen dist --help`.

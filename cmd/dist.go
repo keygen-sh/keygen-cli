@@ -19,12 +19,12 @@ import (
 )
 
 var (
-	releasesPublishOpts = &CommandOptions{}
-	releasesPublishCmd  = &cobra.Command{
-		Use:   "publish <path>",
+	distOpts = &CommandOptions{}
+	distCmd  = &cobra.Command{
+		Use:   "dist <path>",
 		Short: "publish a new release for a product",
-		Args:  releasesPublishArgs,
-		RunE:  releasesPublishRun,
+		Args:  distArgs,
+		RunE:  distRun,
 
 		// Encountering an error should not display usage
 		SilenceUsage: true,
@@ -32,25 +32,31 @@ var (
 )
 
 func init() {
-	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.filename, "filename", "", "filename for the release (default is filename from <path>)")
-	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.version, "version", "", "version for the release (required)")
-	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.name, "name", "", "human-readable name for the release")
-	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.platform, "platform", "", "platform for the release (required)")
-	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
-	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.signingKey, "signing-key", "", "path to ed25519 private key for signing the release")
+	distCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier (required)")
+	distCmd.Flags().StringVar(&keygenext.Product, "product", "", "your keygen.sh product identifier (required)")
+	distCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product token (required)")
+	distCmd.Flags().StringVar(&distOpts.filename, "filename", "", "filename for the release (default is filename from <path>)")
+	distCmd.Flags().StringVar(&distOpts.version, "version", "", "version for the release (required)")
+	distCmd.Flags().StringVar(&distOpts.name, "name", "", "human-readable name for the release")
+	distCmd.Flags().StringVar(&distOpts.platform, "platform", "", "platform for the release (required)")
+	distCmd.Flags().StringVar(&distOpts.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
+	distCmd.Flags().StringVar(&distOpts.signingKey, "signing-key", "", "path to ed25519 private key for signing the release")
 
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
-	releasesPublishCmd.Flags().StringSliceVar(&releasesPublishOpts.constraints, "constraints", []string{}, "comma seperated list of entitlement identifiers (e.g. --constraints <id>,<id>,...)")
+	distCmd.Flags().StringSliceVar(&distOpts.constraints, "constraints", []string{}, "comma seperated list of entitlement identifiers (e.g. --constraints <id>,<id>,...)")
 
 	// TODO(ezekg) Add metadata flag
 
-	releasesPublishCmd.MarkFlagRequired("version")
-	releasesPublishCmd.MarkFlagRequired("platform")
+	distCmd.MarkFlagRequired("account")
+	distCmd.MarkFlagRequired("product")
+	distCmd.MarkFlagRequired("token")
+	distCmd.MarkFlagRequired("version")
+	distCmd.MarkFlagRequired("platform")
 
-	releasesCmd.AddCommand(releasesPublishCmd)
+	rootCmd.AddCommand(distCmd)
 }
 
-func releasesPublishArgs(cmd *cobra.Command, args []string) error {
+func distArgs(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
 		return errors.New("path to file is required")
 	}
@@ -58,7 +64,7 @@ func releasesPublishArgs(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func releasesPublishRun(cmd *cobra.Command, args []string) error {
+func distRun(cmd *cobra.Command, args []string) error {
 	// s := spinner.New(spinner.CharSets[13], 100*time.Millisecond)
 	// s.HideCursor = true
 	// s.Start()
@@ -91,26 +97,26 @@ func releasesPublishRun(cmd *cobra.Command, args []string) error {
 	}
 
 	// Allow filename to be overridden
-	if n := releasesPublishOpts.filename; n != "" {
+	if n := distOpts.filename; n != "" {
 		filename = n
 	}
 
-	channel := releasesPublishOpts.channel
-	platform := releasesPublishOpts.platform
+	channel := distOpts.channel
+	platform := distOpts.platform
 
 	constraints := keygenext.Constraints{}
-	if c := releasesPublishOpts.constraints; len(c) != 0 {
+	if c := distOpts.constraints; len(c) != 0 {
 		constraints = constraints.From(c)
 	}
 
 	var name *string
-	if n := releasesPublishOpts.name; n != "" {
+	if n := distOpts.name; n != "" {
 		name = &n
 	}
 
-	version, err := semver.NewVersion(releasesPublishOpts.version)
+	version, err := semver.NewVersion(distOpts.version)
 	if err != nil {
-		return fmt.Errorf(`version "%s" is not acceptable (%s)`, releasesPublishOpts.version, strings.ToLower(err.Error()))
+		return fmt.Errorf(`version "%s" is not acceptable (%s)`, distOpts.version, strings.ToLower(err.Error()))
 	}
 
 	// s.Suffix = " generating checksum for release..."
@@ -122,7 +128,7 @@ func releasesPublishRun(cmd *cobra.Command, args []string) error {
 	}
 
 	var signature *string
-	if pk := releasesPublishOpts.signingKey; pk != "" {
+	if pk := distOpts.signingKey; pk != "" {
 		// s.Suffix = " generating signature for release..."
 
 		path, err := homedir.Expand(pk)

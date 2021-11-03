@@ -1,6 +1,7 @@
 go 1.17
 
 directory (
-	./keygenext
+	./internal/ed25519ph
+	./internal/keygenext
 	./cmd
 )

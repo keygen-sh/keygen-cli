@@ -12,8 +12,8 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver"
-	"github.com/keygen-sh/keygen-cli/ed25519ph"
-	"github.com/keygen-sh/keygen-cli/keygenext"
+	"github.com/keygen-sh/keygen-cli/internal/ed25519ph"
+	"github.com/keygen-sh/keygen-cli/internal/keygenext"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )

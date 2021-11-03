@@ -6,6 +6,10 @@ import (
 	"github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
 )
 
+func GenerateKey() (ed25519.PublicKey, ed25519.PrivateKey, error) {
+	return ed25519.GenerateKey(nil)
+}
+
 func Sign(privateKey ed25519.PrivateKey, digest []byte) ([]byte, error) {
 	return privateKey.Sign(nil, digest, &ed25519.Options{Hash: crypto.SHA512})
 }

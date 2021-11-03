@@ -21,7 +21,7 @@ import (
 var (
 	releasesPublishCmd = &cobra.Command{
 		Use:   "publish <path>",
-		Short: "Publish a new release for a product",
+		Short: "publish a new release for a product",
 		Args:  releasesPublishArgs,
 		RunE:  releasesPublishRun,
 

@@ -8,7 +8,7 @@ import (
 var (
 	releasesCmd = &cobra.Command{
 		Use:   "releases",
-		Short: "Manage releases for your keygen.sh products",
+		Short: "manage releases for your keygen.sh products",
 	}
 )
 

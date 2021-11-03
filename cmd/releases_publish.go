@@ -37,7 +37,7 @@ func init() {
 	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.name, "name", "", "human-readable name for the release")
 	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.platform, "platform", "", "platform for the release (required)")
 	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
-	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.signingKey, "signing-key", "", "path to ed25519 signing key for signing releases")
+	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.signingKey, "signing-key", "", "path to ed25519 private key for signing the release")
 
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
 	releasesPublishCmd.Flags().StringSliceVar(&releasesPublishOpts.constraints, "constraints", []string{}, "comma seperated list of entitlement identifiers (e.g. --constraints <id>,<id>,...)")

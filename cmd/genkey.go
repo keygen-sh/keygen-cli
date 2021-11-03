@@ -46,18 +46,18 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	if err := savePrivateKey(priv); err != nil {
+	if err := writePrivateKeyFile(priv); err != nil {
 		return err
 	}
 
-	if err := savePublicKey(pub); err != nil {
+	if err := writePublicKeyFile(pub); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func savePrivateKey(privateKey ed25519ph.PrivateKey) error {
+func writePrivateKeyFile(privateKey ed25519ph.PrivateKey) error {
 	file, err := os.Create("keygen.key")
 	if err != nil {
 		return err
@@ -73,7 +73,7 @@ func savePrivateKey(privateKey ed25519ph.PrivateKey) error {
 	return nil
 }
 
-func savePublicKey(publicKey ed25519ph.PublicKey) error {
+func writePublicKeyFile(publicKey ed25519ph.PublicKey) error {
 	file, err := os.Create("keygen.pub")
 	if err != nil {
 		return err

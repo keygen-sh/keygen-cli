@@ -17,6 +17,7 @@ keygen genkey
 Publish a new release. This command will create a new release object, and then
 upload the file at `<path>` to the release's artifact relationship. When the
 `--signing-key` flag is provided, the release will be signed using Ed25519ph.
+In addition, a SHA-512 checksum will be generated for the release.
 
 For more usage options run `keygen releases publish --help`.
 

@@ -12,7 +12,6 @@ const (
 )
 
 var (
-	options = &CommandOptions{}
 	rootCmd = &cobra.Command{
 		Use:     "keygen",
 		Short:   "CLI to interact with keygen.sh",
@@ -30,8 +29,8 @@ type CommandOptions struct {
 	platform    string
 	channel     string
 	constraints []string
-	privateKey  string
-	publicKey   string
+	signingKey  string
+	verifyKey   string
 }
 
 func Execute() {

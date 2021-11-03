@@ -19,7 +19,8 @@ import (
 )
 
 var (
-	releasesPublishCmd = &cobra.Command{
+	releasesPublishOpts = &CommandOptions{}
+	releasesPublishCmd  = &cobra.Command{
 		Use:   "publish <path>",
 		Short: "publish a new release for a product",
 		Args:  releasesPublishArgs,
@@ -31,15 +32,15 @@ var (
 )
 
 func init() {
-	releasesPublishCmd.Flags().StringVar(&options.filename, "filename", "", "filename for the release (default is filename from <path>)")
-	releasesPublishCmd.Flags().StringVar(&options.version, "version", "", "version for the release (required)")
-	releasesPublishCmd.Flags().StringVar(&options.name, "name", "", "human-readable name for the release")
-	releasesPublishCmd.Flags().StringVar(&options.platform, "platform", "", "platform for the release (required)")
-	releasesPublishCmd.Flags().StringVar(&options.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
-	releasesPublishCmd.Flags().StringVar(&options.privateKey, "signing-key", "", "path to ed25519 private key for signing releases")
+	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.filename, "filename", "", "filename for the release (default is filename from <path>)")
+	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.version, "version", "", "version for the release (required)")
+	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.name, "name", "", "human-readable name for the release")
+	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.platform, "platform", "", "platform for the release (required)")
+	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
+	releasesPublishCmd.Flags().StringVar(&releasesPublishOpts.signingKey, "signing-key", "", "path to ed25519 signing key for signing releases")
 
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
-	releasesPublishCmd.Flags().StringSliceVar(&options.constraints, "constraints", []string{}, "comma seperated list of entitlement identifiers (e.g. --constraints <id>,<id>,...)")
+	releasesPublishCmd.Flags().StringSliceVar(&releasesPublishOpts.constraints, "constraints", []string{}, "comma seperated list of entitlement identifiers (e.g. --constraints <id>,<id>,...)")
 
 	// TODO(ezekg) Add metadata flag
 
@@ -90,26 +91,26 @@ func releasesPublishRun(cmd *cobra.Command, args []string) error {
 	}
 
 	// Allow filename to be overridden
-	if n := options.filename; n != "" {
+	if n := releasesPublishOpts.filename; n != "" {
 		filename = n
 	}
 
-	channel := options.channel
-	platform := options.platform
+	channel := releasesPublishOpts.channel
+	platform := releasesPublishOpts.platform
 
 	constraints := keygenext.Constraints{}
-	if c := options.constraints; len(c) != 0 {
+	if c := releasesPublishOpts.constraints; len(c) != 0 {
 		constraints = constraints.From(c)
 	}
 
 	var name *string
-	if n := options.name; n != "" {
+	if n := releasesPublishOpts.name; n != "" {
 		name = &n
 	}
 
-	version, err := semver.NewVersion(options.version)
+	version, err := semver.NewVersion(releasesPublishOpts.version)
 	if err != nil {
-		return fmt.Errorf(`version "%s" is not acceptable (%s)`, options.version, strings.ToLower(err.Error()))
+		return fmt.Errorf(`version "%s" is not acceptable (%s)`, releasesPublishOpts.version, strings.ToLower(err.Error()))
 	}
 
 	// s.Suffix = " generating checksum for release..."
@@ -121,12 +122,12 @@ func releasesPublishRun(cmd *cobra.Command, args []string) error {
 	}
 
 	var signature *string
-	if pk := options.privateKey; pk != "" {
+	if pk := releasesPublishOpts.signingKey; pk != "" {
 		// s.Suffix = " generating signature for release..."
 
 		path, err := homedir.Expand(pk)
 		if err != nil {
-			return fmt.Errorf(`private-key "%s" is not expandable (%s)`, pk, err)
+			return fmt.Errorf(`signing-key "%s" is not expandable (%s)`, pk, err)
 		}
 
 		sig, err := calculateSignature(path, file)
@@ -187,16 +188,16 @@ func calculateChecksum(file *os.File) (string, error) {
 	return hex.EncodeToString(shasum), nil
 }
 
-func calculateSignature(privateKeyPath string, file *os.File) (string, error) {
+func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
 	defer file.Seek(0, io.SeekStart) // reset reader
 
-	privateKey := make(ed25519ph.PrivateKey, ed25519ph.PrivateKeySize)
-	encKey, err := os.ReadFile(privateKeyPath)
+	signingKey := make(ed25519ph.SigningKey, ed25519ph.SigningKeySize)
+	encKey, err := os.ReadFile(signingKeyPath)
 	if err != nil {
 		return "", err
 	}
 
-	if _, err := hex.Decode(privateKey, encKey); err != nil {
+	if _, err := hex.Decode(signingKey, encKey); err != nil {
 		return "", err
 	}
 
@@ -210,7 +211,7 @@ func calculateSignature(privateKeyPath string, file *os.File) (string, error) {
 	digest := h.Sum(nil)
 
 	// TODO(ezekg) Validate key size to guard against Sign panicing
-	sig, err := ed25519ph.Sign(privateKey, digest)
+	sig, err := ed25519ph.Sign(signingKey, digest)
 	if err != nil {
 		return "", err
 	}

@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/keygen-sh/keygen-cli/internal/ed25519ph"
 	"github.com/mitchellh/go-homedir"
@@ -11,7 +12,8 @@ import (
 )
 
 var (
-	genkeyCmd = &cobra.Command{
+	genkeyOpts = &CommandOptions{}
+	genkeyCmd  = &cobra.Command{
 		Use:   "genkey",
 		Short: "generate an ed25519 keypair for code signing",
 		RunE:  genkeyRun,
@@ -22,55 +24,67 @@ var (
 )
 
 func init() {
-	genkeyCmd.Flags().StringVar(&options.privateKey, "private-key", "keygen.key", "write private key to file (e.g. --private-key ~/keygen.key)")
-	genkeyCmd.Flags().StringVar(&options.publicKey, "public-key", "keygen.pub", "write public key to file (e.g. --public-key ~/keygen.pub)")
+	genkeyCmd.Flags().StringVar(&genkeyOpts.signingKey, "signing-key", "keygen.key", "write private signing key to file")
+	genkeyCmd.Flags().StringVar(&genkeyOpts.verifyKey, "verify-key", "keygen.pub", "write public verify key to file")
 
 	rootCmd.AddCommand(genkeyCmd)
 }
 
 func genkeyRun(cmd *cobra.Command, args []string) error {
-	privateKeyPath, err := homedir.Expand(options.privateKey)
+	signingKeyPath, err := homedir.Expand(genkeyOpts.signingKey)
 	if err != nil {
-		return fmt.Errorf(`path "%s" is not expandable (%s)`, options.privateKey, err)
+		return fmt.Errorf(`path "%s" is not expandable (%s)`, genkeyOpts.signingKey, err)
 	}
 
-	publicKeyPath, err := homedir.Expand(options.publicKey)
+	verifyKeyPath, err := homedir.Expand(genkeyOpts.verifyKey)
 	if err != nil {
-		return fmt.Errorf(`path "%s" is not expandable (%s)`, options.publicKey, err)
+		return fmt.Errorf(`path "%s" is not expandable (%s)`, genkeyOpts.verifyKey, err)
 	}
 
-	if _, err := os.Stat(privateKeyPath); err == nil {
-		return fmt.Errorf(`private key file "%s" already exists`, privateKeyPath)
+	if _, err := os.Stat(signingKeyPath); err == nil {
+		return fmt.Errorf(`signing key file "%s" already exists`, signingKeyPath)
 	}
 
-	if _, err := os.Stat(publicKeyPath); err == nil {
-		return fmt.Errorf(`public key file "%s" already exists`, publicKeyPath)
+	if _, err := os.Stat(verifyKeyPath); err == nil {
+		return fmt.Errorf(`verify key file "%s" already exists`, verifyKeyPath)
 	}
 
-	publicKey, privateKey, err := ed25519ph.GenerateKey()
+	verifyKey, signingKey, err := ed25519ph.GenerateKey()
 	if err != nil {
 		return err
 	}
 
-	if err := writePrivateKeyFile(privateKeyPath, privateKey); err != nil {
+	if err := writesigningKeyFile(signingKeyPath, signingKey); err != nil {
 		return err
 	}
 
-	if err := writePublicKeyFile(publicKeyPath, publicKey); err != nil {
+	if err := writeverifyKeyFile(verifyKeyPath, verifyKey); err != nil {
 		return err
+	}
+
+	if abs, err := filepath.Abs(signingKeyPath); err != nil {
+		fmt.Printf("Signing key: %s\n", signingKeyPath)
+	} else {
+		fmt.Printf("Signing key: %s\n", abs)
+	}
+
+	if abs, err := filepath.Abs(verifyKeyPath); err != nil {
+		fmt.Printf("Verify key: %s\n", verifyKeyPath)
+	} else {
+		fmt.Printf("Verify key: %s\n", abs)
 	}
 
 	return nil
 }
 
-func writePrivateKeyFile(path string, privateKey ed25519ph.PrivateKey) error {
-	file, err := os.Create(path)
+func writesigningKeyFile(signingKeyPath string, signingKey ed25519ph.SigningKey) error {
+	file, err := os.Create(signingKeyPath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	enc := hex.EncodeToString(privateKey)
+	enc := hex.EncodeToString(signingKey)
 	_, err = file.WriteString(enc)
 	if err != nil {
 		return err
@@ -79,14 +93,14 @@ func writePrivateKeyFile(path string, privateKey ed25519ph.PrivateKey) error {
 	return nil
 }
 
-func writePublicKeyFile(path string, publicKey ed25519ph.PublicKey) error {
-	file, err := os.Create(path)
+func writeverifyKeyFile(verifyKeyPath string, verifyKey ed25519ph.VerifyKey) error {
+	file, err := os.Create(verifyKeyPath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	enc := hex.EncodeToString(publicKey)
+	enc := hex.EncodeToString(verifyKey)
 	_, err = file.WriteString(enc)
 	if err != nil {
 		return err

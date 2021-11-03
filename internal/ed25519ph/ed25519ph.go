@@ -7,22 +7,22 @@ import (
 )
 
 const (
-	PublicKeySize  = ed25519.PublicKeySize
-	PrivateKeySize = ed25519.PrivateKeySize
+	SigningKeySize = ed25519.PrivateKeySize
+	VerifyKeySize  = ed25519.PublicKeySize
 	SignatureSize  = ed25519.SignatureSize
 )
 
-type PrivateKey = ed25519.PrivateKey
-type PublicKey = ed25519.PublicKey
+type SigningKey = ed25519.PrivateKey
+type VerifyKey = ed25519.PublicKey
 
-func GenerateKey() (ed25519.PublicKey, ed25519.PrivateKey, error) {
+func GenerateKey() (VerifyKey, SigningKey, error) {
 	return ed25519.GenerateKey(nil)
 }
 
-func Sign(privateKey ed25519.PrivateKey, digest []byte) ([]byte, error) {
+func Sign(privateKey SigningKey, digest []byte) ([]byte, error) {
 	return privateKey.Sign(nil, digest, &ed25519.Options{Hash: crypto.SHA512})
 }
 
-func Verify(publicKey ed25519.PublicKey, digest []byte, sig []byte) bool {
+func Verify(publicKey VerifyKey, digest []byte, sig []byte) bool {
 	return ed25519.VerifyWithOptions(publicKey, digest, sig, &ed25519.Options{Hash: crypto.SHA512})
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/Masterminds/semver"
 	"github.com/keygen-sh/keygen-cli/internal/ed25519ph"
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
+	"github.com/keygen-sh/keygen-cli/internal/spinnerext"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
@@ -68,9 +69,8 @@ func distArgs(cmd *cobra.Command, args []string) error {
 }
 
 func distRun(cmd *cobra.Command, args []string) error {
-	// s := spinner.New(spinner.CharSets[13], 100*time.Millisecond)
-	// s.HideCursor = true
-	// s.Start()
+	spinner := spinnerext.New()
+	spinner.Start()
 
 	path, err := homedir.Expand(args[0])
 	if err != nil {
@@ -129,7 +129,7 @@ func distRun(cmd *cobra.Command, args []string) error {
 
 	checksum := distOpts.checksum
 	if checksum == "" {
-		// s.Suffix = " generating checksum for release..."
+		spinner.Update("generating checksum for release...")
 
 		checksum, err = calculateChecksum(file)
 		if err != nil {
@@ -139,7 +139,7 @@ func distRun(cmd *cobra.Command, args []string) error {
 
 	signature := distOpts.signature
 	if pk := distOpts.signingKey; pk != "" && signature == "" {
-		// s.Suffix = " generating signature for release..."
+		spinner.Update("generating signature for release...")
 
 		path, err := homedir.Expand(pk)
 		if err != nil {
@@ -168,21 +168,19 @@ func distRun(cmd *cobra.Command, args []string) error {
 	}
 
 	// TODO(ezekg) Should we do a Create() unless a --upsert flag is given?
-	// s.Suffix = " creating release object..."
+	spinner.Update("creating release object...")
 
 	if err := release.Upsert(); err != nil {
 		return err
 	}
 
-	// s.Suffix = " uploading release artifact..."
+	spinner.Update("uploading release artifact...")
 
 	if err := release.Upload(file); err != nil {
 		return err
 	}
 
-	// s.Suffix = ""
-	// s.FinalMSG = "successfully published release \"" + release.ID + "\"\n"
-	// s.Stop()
+	spinner.Stop(`successfully published release "` + release.ID + `"`)
 
 	return nil
 }

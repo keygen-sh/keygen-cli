@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/keygen-sh/keygen-cli/internal/ed25519ph"
+	"github.com/keygen-sh/keygen-cli/internal/spinnerext"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
@@ -31,6 +32,9 @@ func init() {
 }
 
 func genkeyRun(cmd *cobra.Command, args []string) error {
+	spinner := spinnerext.New()
+	spinner.Start()
+
 	signingKeyPath, err := homedir.Expand(genkeyOpts.signingKey)
 	if err != nil {
 		return fmt.Errorf(`path "%s" is not expandable (%s)`, genkeyOpts.signingKey, err)
@@ -49,30 +53,36 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf(`verify key file "%s" already exists`, verifyKeyPath)
 	}
 
+	spinner.Update("generating key pair...")
+
 	verifyKey, signingKey, err := ed25519ph.GenerateKey()
 	if err != nil {
 		return err
 	}
 
+	spinner.Update("writing signing key to file...")
+
 	if err := writeSigningKeyFile(signingKeyPath, signingKey); err != nil {
 		return err
 	}
+
+	spinner.Update("writing verify key to file...")
 
 	if err := writeVerifyKeyFile(verifyKeyPath, verifyKey); err != nil {
 		return err
 	}
 
-	if abs, err := filepath.Abs(signingKeyPath); err != nil {
-		fmt.Printf("Signing key: %s\n", signingKeyPath)
-	} else {
-		fmt.Printf("Signing key: %s\n", abs)
+	if abs, err := filepath.Abs(signingKeyPath); err == nil {
+		signingKeyPath = abs
 	}
 
-	if abs, err := filepath.Abs(verifyKeyPath); err != nil {
-		fmt.Printf("Verify key: %s\n", verifyKeyPath)
-	} else {
-		fmt.Printf("Verify key: %s\n", abs)
+	if abs, err := filepath.Abs(verifyKeyPath); err == nil {
+		verifyKeyPath = abs
 	}
+
+	spinner.Stop(
+		fmt.Sprintf("Signing key: %s\nVerify key: %s", signingKeyPath, verifyKeyPath),
+	)
 
 	return nil
 }

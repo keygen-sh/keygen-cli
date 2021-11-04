@@ -38,6 +38,7 @@ func init() {
 	distCmd.Flags().StringVar(&distOpts.filename, "filename", "", "filename for the release (default is filename from <path>)")
 	distCmd.Flags().StringVar(&distOpts.version, "version", "", "version for the release (required)")
 	distCmd.Flags().StringVar(&distOpts.name, "name", "", "human-readable name for the release")
+	distCmd.Flags().StringVar(&distOpts.description, "description", "", "description for the release (e.g. release notes)")
 	distCmd.Flags().StringVar(&distOpts.platform, "platform", "", "platform for the release (required)")
 	distCmd.Flags().StringVar(&distOpts.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
 	distCmd.Flags().StringVar(&distOpts.signingKey, "signing-key", "", "path to ed25519 private key for signing the release")
@@ -114,6 +115,11 @@ func distRun(cmd *cobra.Command, args []string) error {
 		name = &n
 	}
 
+	var desc *string
+	if d := distOpts.description; d != "" {
+		desc = &d
+	}
+
 	version, err := semver.NewVersion(distOpts.version)
 	if err != nil {
 		return fmt.Errorf(`version "%s" is not acceptable (%s)`, distOpts.version, strings.ToLower(err.Error()))
@@ -146,6 +152,7 @@ func distRun(cmd *cobra.Command, args []string) error {
 
 	release := &keygenext.Release{
 		Name:        name,
+		Description: desc,
 		Version:     version.String(),
 		Filename:    filename,
 		Filesize:    filesize,

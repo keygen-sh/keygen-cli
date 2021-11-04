@@ -25,6 +25,7 @@ var (
 type CommandOptions struct {
 	filename    string
 	name        string
+	description string
 	version     string
 	platform    string
 	channel     string

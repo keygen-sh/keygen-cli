@@ -11,6 +11,7 @@ type Release struct {
 	ID          string                 `json:"-"`
 	Type        string                 `json:"-"`
 	Name        *string                `json:"name"`
+	Description *string                `json:"description"`
 	Version     string                 `json:"version"`
 	Filename    string                 `json:"filename"`
 	Filetype    string                 `json:"filetype"`

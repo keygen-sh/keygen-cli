@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"crypto"
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/hex"
@@ -12,10 +13,10 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver"
-	"github.com/keygen-sh/keygen-cli/internal/ed25519ph"
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
 	"github.com/keygen-sh/keygen-cli/internal/spinnerext"
 	"github.com/mitchellh/go-homedir"
+	"github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
 	"github.com/spf13/cobra"
 )
 
@@ -203,7 +204,7 @@ func calculateChecksum(file *os.File) (string, error) {
 func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
 	defer file.Seek(0, io.SeekStart) // reset reader
 
-	signingKey := make(ed25519ph.SigningKey, ed25519ph.SigningKeySize)
+	signingKey := make(ed25519.PrivateKey, ed25519.PrivateKeySize)
 	encKey, err := os.ReadFile(signingKeyPath)
 	if err != nil {
 		return "", err
@@ -223,7 +224,7 @@ func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
 	digest := h.Sum(nil)
 
 	// TODO(ezekg) Validate key size to guard against Sign panicing
-	sig, err := ed25519ph.Sign(signingKey, digest)
+	sig, err := signingKey.Sign(nil, digest, &ed25519.Options{Hash: crypto.SHA512})
 	if err != nil {
 		return "", err
 	}

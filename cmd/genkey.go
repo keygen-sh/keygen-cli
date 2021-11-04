@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/keygen-sh/keygen-cli/internal/ed25519ph"
 	"github.com/keygen-sh/keygen-cli/internal/spinnerext"
 	"github.com/mitchellh/go-homedir"
+	"github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
 	"github.com/spf13/cobra"
 )
 
@@ -55,7 +55,7 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 
 	spinnerext.Text("generating key pair...")
 
-	verifyKey, signingKey, err := ed25519ph.GenerateKey()
+	verifyKey, signingKey, err := ed25519.GenerateKey(nil)
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ Notice: never share your publishing key, it's a secret!`,
 	return nil
 }
 
-func writeSigningKeyFile(signingKeyPath string, signingKey ed25519ph.SigningKey) error {
+func writeSigningKeyFile(signingKeyPath string, signingKey ed25519.PrivateKey) error {
 	file, err := os.OpenFile(signingKeyPath, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return err
@@ -109,7 +109,7 @@ func writeSigningKeyFile(signingKeyPath string, signingKey ed25519ph.SigningKey)
 	return nil
 }
 
-func writeVerifyKeyFile(verifyKeyPath string, verifyKey ed25519ph.VerifyKey) error {
+func writeVerifyKeyFile(verifyKeyPath string, verifyKey ed25519.PublicKey) error {
 	file, err := os.OpenFile(verifyKeyPath, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		return err

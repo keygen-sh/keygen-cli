@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/briandowns/spinner v1.13.0
 	github.com/keygen-sh/jsonapi-go v1.1.0
-	github.com/keygen-sh/keygen-go v1.8.0-alpha.3
+	github.com/keygen-sh/keygen-go v1.8.0
 	github.com/mattn/go-tty v0.0.3
 	github.com/mitchellh/go-homedir v1.0.0
 	github.com/oasisprotocol/curve25519-voi v0.0.0-20211102120939-d5a936accd94

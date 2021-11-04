@@ -25,6 +25,8 @@ func init() {
 	keygen.Account = "1fddcec8-8dd3-4d8d-9b16-215cac0f9b52"
 	keygen.Product = "2313b7e7-1ea6-4a01-901e-2931de6bb1e2"
 
+	// TODO(ezekg) Add verify key for upgrading
+
 	rootCmd.AddCommand(upgradeCmd)
 }
 

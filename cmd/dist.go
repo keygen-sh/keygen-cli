@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"bufio"
 	"crypto/sha512"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -189,17 +189,15 @@ func distRun(cmd *cobra.Command, args []string) error {
 func calculateChecksum(file *os.File) (string, error) {
 	defer file.Seek(0, io.SeekStart) // reset reader
 
-	reader := bufio.NewReader(file)
 	h := sha512.New()
 
-	_, err := io.Copy(h, reader)
-	if err != nil {
+	if _, err := io.Copy(h, file); err != nil {
 		return "", err
 	}
 
-	shasum := h.Sum(nil)
+	digest := h.Sum(nil)
 
-	return hex.EncodeToString(shasum), nil
+	return base64.RawStdEncoding.EncodeToString(digest), nil
 }
 
 func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
@@ -218,7 +216,7 @@ func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
 	// We're using Ed25519ph which expects a pre-hashed message using SHA-512
 	h := sha512.New()
 
-	if _, err = io.Copy(h, file); err != nil {
+	if _, err := io.Copy(h, file); err != nil {
 		return "", err
 	}
 
@@ -230,5 +228,5 @@ func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
 		return "", err
 	}
 
-	return hex.EncodeToString(sig), nil
+	return base64.RawStdEncoding.EncodeToString(sig), nil
 }

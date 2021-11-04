@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 
+	"github.com/keygen-sh/keygen-cli/internal/keygenext"
 	"github.com/spf13/cobra"
 )
 
@@ -34,6 +35,10 @@ type CommandOptions struct {
 	checksum    string
 	signingKey  string
 	verifyKey   string
+}
+
+func init() {
+	keygenext.UserAgent = "cli/" + Version
 }
 
 func Execute() {

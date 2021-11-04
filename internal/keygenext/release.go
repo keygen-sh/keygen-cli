@@ -64,7 +64,7 @@ func (r Release) GetRelationships() map[string]interface{} {
 }
 
 func (r *Release) Upsert() error {
-	client := &keygen.Client{Account: Account, Token: Token}
+	client := &keygen.Client{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent}
 
 	res, err := client.Put("releases", r, r)
 	if err != nil {
@@ -81,7 +81,7 @@ func (r *Release) Upsert() error {
 }
 
 func (r *Release) Upload(file *os.File) error {
-	client := &keygen.Client{Account: Account, Token: Token}
+	client := &keygen.Client{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent}
 	artifact := &Artifact{}
 
 	res, err := client.Put("releases/"+r.ID+"/artifact", nil, artifact)

@@ -2,13 +2,12 @@ package keygenext
 
 import "strings"
 
-// FIXME(ezekg) Add overrides for UserAgent and PublicKey. Currently,
-//              adding auto-upgrades to the CLI using our Go SDK will
-//              cause issues since PublicKey is a global.
 var (
-	Account string
-	Product string
-	Token   string
+	Account   string
+	Product   string
+	Token     string
+	PublicKey string
+	UserAgent string
 )
 
 type APIError struct {

@@ -26,8 +26,8 @@ var (
 )
 
 func init() {
-	genkeyCmd.Flags().StringVar(&genkeyOpts.signingKey, "out", "keygen.key", "output the private signing key to specified file")
-	genkeyCmd.Flags().StringVar(&genkeyOpts.verifyKey, "pubout", "keygen.pub", "output the public key to specified file")
+	genkeyCmd.Flags().StringVar(&genkeyOpts.signingKey, "out", "keygen.key", "output the private publishing key to specified file")
+	genkeyCmd.Flags().StringVar(&genkeyOpts.verifyKey, "pubout", "keygen.pub", "output the public upgrade key to specified file")
 
 	rootCmd.AddCommand(genkeyCmd)
 }
@@ -80,9 +80,15 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 		verifyKeyPath = abs
 	}
 
-	spinnerext.Stop(
-		fmt.Sprintf("Signing key: %s\nVerify key: %s", signingKeyPath, verifyKeyPath),
+	msg := fmt.Sprintf(`Private publishing key: %s
+Public upgrade key: %s
+
+Notice: never share your publishing key, it's a secret!`,
+		signingKeyPath,
+		verifyKeyPath,
 	)
+
+	spinnerext.Stop(msg)
 
 	return nil
 }

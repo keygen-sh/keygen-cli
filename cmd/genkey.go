@@ -17,6 +17,7 @@ var (
 	genkeyCmd  = &cobra.Command{
 		Use:   "genkey",
 		Short: "generate an ed25519 key pair for code signing",
+		Args:  cobra.NoArgs,
 		RunE:  genkeyRun,
 
 		// Encountering an error should not display usage
@@ -32,8 +33,7 @@ func init() {
 }
 
 func genkeyRun(cmd *cobra.Command, args []string) error {
-	spinner := spinnerext.New()
-	spinner.Start()
+	spinnerext.Start()
 
 	signingKeyPath, err := homedir.Expand(genkeyOpts.signingKey)
 	if err != nil {
@@ -53,20 +53,20 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf(`verify key file "%s" already exists`, verifyKeyPath)
 	}
 
-	spinner.Update("generating key pair...")
+	spinnerext.Text("generating key pair...")
 
 	verifyKey, signingKey, err := ed25519ph.GenerateKey()
 	if err != nil {
 		return err
 	}
 
-	spinner.Update("writing signing key to file...")
+	spinnerext.Text("writing signing key to file...")
 
 	if err := writeSigningKeyFile(signingKeyPath, signingKey); err != nil {
 		return err
 	}
 
-	spinner.Update("writing verify key to file...")
+	spinnerext.Text("writing verify key to file...")
 
 	if err := writeVerifyKeyFile(verifyKeyPath, verifyKey); err != nil {
 		return err
@@ -80,7 +80,7 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 		verifyKeyPath = abs
 	}
 
-	spinner.Stop(
+	spinnerext.Stop(
 		fmt.Sprintf("Signing key: %s\nVerify key: %s", signingKeyPath, verifyKeyPath),
 	)
 

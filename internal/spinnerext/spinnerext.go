@@ -7,30 +7,34 @@ import (
 	"github.com/briandowns/spinner"
 )
 
-type Spinner struct {
+var (
 	s *spinner.Spinner
+)
+
+func Start() {
+	s = spinner.New(spinner.CharSets[13], 100*time.Millisecond, spinner.WithWriter(os.Stdout))
+	s.Start()
 }
 
-func (s *Spinner) Start() {
-	s.s.Start()
-}
-
-func (s *Spinner) Update(message string) {
-	s.s.Suffix = " " + message
+func Text(message string) {
+	s.Suffix = " " + message
 
 	time.Sleep(200 * time.Millisecond)
 }
 
-func (s *Spinner) Stop(message string) {
-	s.s.Suffix = ""
-	s.s.FinalMSG = message + "\n"
-	s.s.Stop()
-
-	time.Sleep(200 * time.Millisecond)
+func Pause() {
+	s.Suffix = ""
+	s.Stop()
 }
 
-func New() *Spinner {
-	s := spinner.New(spinner.CharSets[13], 100*time.Millisecond, spinner.WithWriter(os.Stdout))
+func Unpause() {
+	s.Restart()
+}
 
-	return &Spinner{s}
+func Stop(message string) {
+	s.Suffix = ""
+	s.FinalMSG = message + "\n"
+	s.Stop()
+
+	time.Sleep(200 * time.Millisecond)
 }

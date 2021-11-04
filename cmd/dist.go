@@ -69,8 +69,9 @@ func distArgs(cmd *cobra.Command, args []string) error {
 }
 
 func distRun(cmd *cobra.Command, args []string) error {
-	spinner := spinnerext.New()
-	spinner.Start()
+	spinnerext.Start()
+
+	upgradeRun(nil, nil)
 
 	path, err := homedir.Expand(args[0])
 	if err != nil {
@@ -129,7 +130,7 @@ func distRun(cmd *cobra.Command, args []string) error {
 
 	checksum := distOpts.checksum
 	if checksum == "" {
-		spinner.Update("generating checksum for release...")
+		spinnerext.Text("generating checksum for release...")
 
 		checksum, err = calculateChecksum(file)
 		if err != nil {
@@ -139,7 +140,7 @@ func distRun(cmd *cobra.Command, args []string) error {
 
 	signature := distOpts.signature
 	if pk := distOpts.signingKey; pk != "" && signature == "" {
-		spinner.Update("generating signature for release...")
+		spinnerext.Text("generating signature for release...")
 
 		path, err := homedir.Expand(pk)
 		if err != nil {
@@ -168,19 +169,19 @@ func distRun(cmd *cobra.Command, args []string) error {
 	}
 
 	// TODO(ezekg) Should we do a Create() unless a --upsert flag is given?
-	spinner.Update("creating release object...")
+	spinnerext.Text("creating release object...")
 
 	if err := release.Upsert(); err != nil {
 		return err
 	}
 
-	spinner.Update("uploading release artifact...")
+	spinnerext.Text("uploading release artifact...")
 
 	if err := release.Upload(file); err != nil {
 		return err
 	}
 
-	spinner.Stop(`successfully published release "` + release.ID + `"`)
+	spinnerext.Stop(`successfully published release "` + release.ID + `"`)
 
 	return nil
 }

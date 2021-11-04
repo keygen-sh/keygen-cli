@@ -10,6 +10,7 @@ var (
 	versionCmd = &cobra.Command{
 		Use:   "version",
 		Short: "print the current CLI version",
+		Args:  cobra.NoArgs,
 		Run:   versionRun,
 	}
 )

@@ -11,11 +11,13 @@ import (
 
 var (
 	upgradeCmd = &cobra.Command{
-		Use:    "upgrade",
-		Short:  "check if a CLI upgrade is available",
-		Args:   cobra.NoArgs,
-		RunE:   upgradeRun,
-		Hidden: true,
+		Use:   "upgrade",
+		Short: "check if a CLI upgrade is available",
+		Args:  cobra.NoArgs,
+		RunE:  upgradeRun,
+
+		SilenceUsage: true,
+		Hidden:       true,
 	}
 )
 
@@ -33,13 +35,25 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 	}
 	defer tty.Close()
 
+	if cmd != nil {
+		spinnerext.Start()
+	}
+
 	spinnerext.Text("checking for upgrade...")
 
 	release, err := keygen.Upgrade(Version)
 	switch {
 	case err == keygen.ErrUpgradeNotAvailable:
+		if cmd != nil {
+			spinnerext.Stop("all up to date!")
+		}
+
 		return nil
 	case err != nil:
+		if cmd != nil {
+			return err
+		}
+
 		return nil
 	}
 

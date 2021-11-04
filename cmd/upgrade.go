@@ -22,10 +22,9 @@ var (
 )
 
 func init() {
+	keygen.UpgradeKey = "5ec69b78d4b5d4b624699cef5faf3347dc4b06bb807ed4a2c6740129f1db7159"
 	keygen.Account = "1fddcec8-8dd3-4d8d-9b16-215cac0f9b52"
 	keygen.Product = "2313b7e7-1ea6-4a01-901e-2931de6bb1e2"
-
-	// TODO(ezekg) Add verify key for upgrading
 
 	rootCmd.AddCommand(upgradeCmd)
 }
@@ -64,9 +63,16 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 	fmt.Printf("an upgrade is available! would you like to install v" + release.Version + " now? Y/n ")
 
 	r, _ := tty.ReadRune()
+
 	spinnerext.Unpause()
 
-	if string(r) == "n" {
+	// 13  = <enter> (default Y)
+	// 121 = "y"
+	if r != 13 && r != 121 {
+		if cmd != nil {
+			spinnerext.Stop("upgrade aborted")
+		}
+
 		return nil
 	}
 

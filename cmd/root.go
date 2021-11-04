@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	// The current version of the program
+	// The current version of the CLI.
 	Version = "1.0.0"
 )
 

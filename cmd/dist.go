@@ -41,6 +41,8 @@ func init() {
 	distCmd.Flags().StringVar(&distOpts.description, "description", "", "description for the release (e.g. release notes)")
 	distCmd.Flags().StringVar(&distOpts.platform, "platform", "", "platform for the release (required)")
 	distCmd.Flags().StringVar(&distOpts.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
+	distCmd.Flags().StringVar(&distOpts.signature, "signature", "", "pre-calculated signature for the release (defaults using ed25519ph)")
+	distCmd.Flags().StringVar(&distOpts.checksum, "checksum", "", "pre-calculated checksum for the release (defaults using sha-512)")
 	distCmd.Flags().StringVar(&distOpts.signingKey, "signing-key", "", "path to ed25519 private key for signing the release")
 
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
@@ -125,16 +127,18 @@ func distRun(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf(`version "%s" is not acceptable (%s)`, distOpts.version, strings.ToLower(err.Error()))
 	}
 
-	// s.Suffix = " generating checksum for release..."
+	checksum := distOpts.checksum
+	if checksum == "" {
+		// s.Suffix = " generating checksum for release..."
 
-	// Reopen file so that we don't screw with our first reader
-	checksum, err := calculateChecksum(file)
-	if err != nil {
-		return err
+		checksum, err = calculateChecksum(file)
+		if err != nil {
+			return err
+		}
 	}
 
-	var signature *string
-	if pk := distOpts.signingKey; pk != "" {
+	signature := distOpts.signature
+	if pk := distOpts.signingKey; pk != "" && signature == "" {
 		// s.Suffix = " generating signature for release..."
 
 		path, err := homedir.Expand(pk)
@@ -142,12 +146,10 @@ func distRun(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf(`signing-key "%s" is not expandable (%s)`, pk, err)
 		}
 
-		sig, err := calculateSignature(path, file)
+		signature, err = calculateSignature(path, file)
 		if err != nil {
 			return err
 		}
-
-		signature = &sig
 	}
 
 	release := &keygenext.Release{

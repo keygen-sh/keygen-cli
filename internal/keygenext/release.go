@@ -18,7 +18,7 @@ type Release struct {
 	Filesize    int64                  `json:"filesize"`
 	Platform    string                 `json:"platform"`
 	Channel     string                 `json:"channel"`
-	Signature   *string                `json:"signature"`
+	Signature   string                 `json:"signature"`
 	Checksum    string                 `json:"checksum"`
 	Metadata    map[string]interface{} `json:"metadata"`
 	ProductID   string                 `json:"-"`

@@ -72,6 +72,7 @@ func distArgs(cmd *cobra.Command, args []string) error {
 func distRun(cmd *cobra.Command, args []string) error {
 	spinnerext.Start()
 
+	// TODO(ezekg) Add no-auto-upgrade flag
 	upgradeRun(nil, nil)
 
 	path, err := homedir.Expand(args[0])

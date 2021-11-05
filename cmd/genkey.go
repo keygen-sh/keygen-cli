@@ -83,7 +83,7 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 	msg := fmt.Sprintf(`Private publishing key: %s
 Public upgrade key: %s
 
-Notice: never share your publishing key, it's a secret!`,
+Warning: never share your publishing key, it's a secret!`,
 		signingKeyPath,
 		verifyKeyPath,
 	)

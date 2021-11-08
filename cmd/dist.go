@@ -205,14 +205,19 @@ func calculateChecksum(file *os.File) (string, error) {
 func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
 	defer file.Seek(0, io.SeekStart) // reset reader
 
-	signingKey := make(ed25519.PrivateKey, ed25519.PrivateKeySize)
+	var signingKey ed25519.PrivateKey
 	encKey, err := os.ReadFile(signingKeyPath)
 	if err != nil {
 		return "", err
 	}
 
-	if _, err := hex.Decode(signingKey, encKey); err != nil {
+	signingKey, err = hex.DecodeString(string(encKey))
+	if err != nil {
 		return "", err
+	}
+
+	if l := len(signingKey); l != ed25519.PrivateKeySize {
+		return "", fmt.Errorf("bad signing key length (got %d expected 64)", l)
 	}
 
 	// We're using Ed25519ph which expects a pre-hashed message using SHA-512

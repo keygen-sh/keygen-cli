@@ -248,6 +248,8 @@ func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
 		if err != nil {
 			return "", err
 		}
+	default:
+		return "", fmt.Errorf(`signing algorithm "%s" is not supported`, distOpts.signingAlgorithm)
 	}
 
 	return base64.RawStdEncoding.EncodeToString(sig), nil

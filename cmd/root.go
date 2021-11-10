@@ -24,17 +24,18 @@ var (
 )
 
 type CommandOptions struct {
-	filename    string
-	name        string
-	description string
-	version     string
-	platform    string
-	channel     string
-	constraints []string
-	signature   string
-	checksum    string
-	signingKey  string
-	verifyKey   string
+	filename         string
+	name             string
+	description      string
+	version          string
+	platform         string
+	channel          string
+	constraints      []string
+	signature        string
+	checksum         string
+	signingAlgorithm string
+	signingKey       string
+	verifyKey        string
 }
 
 func init() {

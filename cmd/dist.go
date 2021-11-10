@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -45,6 +46,7 @@ func init() {
 	distCmd.Flags().StringVar(&distOpts.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
 	distCmd.Flags().StringVar(&distOpts.signature, "signature", "", "pre-calculated signature for the release (defaults using ed25519ph)")
 	distCmd.Flags().StringVar(&distOpts.checksum, "checksum", "", "pre-calculated checksum for the release (defaults using sha-512)")
+	distCmd.Flags().StringVar(&distOpts.signingAlgorithm, "signing-algorithm", "ed25519ph", "the signing algorithm to use, one of: ed25519ph, ed25519")
 	distCmd.Flags().StringVar(&distOpts.signingKey, "signing-key", "", "path to ed25519 private key for signing the release")
 
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
@@ -220,19 +222,32 @@ func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
 		return "", fmt.Errorf("bad signing key length (got %d expected 64)", l)
 	}
 
-	// We're using Ed25519ph which expects a pre-hashed message using SHA-512
-	h := sha512.New()
+	var sig []byte
+	switch distOpts.signingAlgorithm {
+	case "ed25519ph":
+		// We're using Ed25519ph which expects a pre-hashed message using SHA-512
+		h := sha512.New()
 
-	if _, err := io.Copy(h, file); err != nil {
-		return "", err
-	}
+		if _, err := io.Copy(h, file); err != nil {
+			return "", err
+		}
 
-	digest := h.Sum(nil)
+		digest := h.Sum(nil)
+		sig, err = signingKey.Sign(nil, digest, &ed25519.Options{Hash: crypto.SHA512})
+		if err != nil {
+			return "", err
+		}
+	case "ed25519":
+		b, err := ioutil.ReadAll(file)
+		if err != nil {
+			return "", err
+		}
 
-	// TODO(ezekg) Validate key size to guard against Sign panicing
-	sig, err := signingKey.Sign(nil, digest, &ed25519.Options{Hash: crypto.SHA512})
-	if err != nil {
-		return "", err
+		// TODO(ezekg) Validate key size to guard against Sign panicing
+		sig, err = signingKey.Sign(nil, b, &ed25519.Options{})
+		if err != nil {
+			return "", err
+		}
 	}
 
 	return base64.RawStdEncoding.EncodeToString(sig), nil

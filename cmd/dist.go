@@ -34,9 +34,9 @@ var (
 )
 
 func init() {
-	distCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier (required)")
-	distCmd.Flags().StringVar(&keygenext.Product, "product", "", "your keygen.sh product identifier (required)")
-	distCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product token (required)")
+	distCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID] (required)")
+	distCmd.Flags().StringVar(&keygenext.Product, "product", "", "your keygen.sh product identifier [$KEYGEN_PRODUCT_ID] (required)")
+	distCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product token [$KEYGEN_PRODUCT_TOKEN] (required)")
 	distCmd.Flags().StringVar(&distOpts.filename, "filename", "", "filename for the release (default is filename from <path>)")
 	distCmd.Flags().StringVar(&distOpts.version, "version", "", "version for the release (required)")
 	distCmd.Flags().StringVar(&distOpts.name, "name", "", "human-readable name for the release")
@@ -51,12 +51,39 @@ func init() {
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
 	distCmd.Flags().StringSliceVar(&distOpts.entitlements, "entitlements", []string{}, "comma seperated list of entitlement constraints (e.g. --entitlements <id>,<id>,...)")
 
-	// TODO(ezekg) Use bubbletea to allow multi-line description?
+	// TODO(ezekg) Prompt multi-line description input from stdin if "--"?
 	// TODO(ezekg) Add metadata flag
 
-	distCmd.MarkFlagRequired("account")
-	distCmd.MarkFlagRequired("product")
-	distCmd.MarkFlagRequired("token")
+	if v := os.Getenv("KEYGEN_ACCOUNT_ID"); v != "" {
+		if keygenext.Account == "" {
+			keygenext.Account = v
+		}
+	}
+
+	if v := os.Getenv("KEYGEN_PRODUCT_ID"); v != "" {
+		if keygenext.Product == "" {
+			keygenext.Product = v
+		}
+	}
+
+	if v := os.Getenv("KEYGEN_PRODUCT_TOKEN"); v != "" {
+		if keygenext.Token == "" {
+			keygenext.Token = v
+		}
+	}
+
+	if keygenext.Account == "" {
+		distCmd.MarkFlagRequired("account")
+	}
+
+	if keygenext.Product == "" {
+		distCmd.MarkFlagRequired("product")
+	}
+
+	if keygenext.Token == "" {
+		distCmd.MarkFlagRequired("token")
+	}
+
 	distCmd.MarkFlagRequired("version")
 	distCmd.MarkFlagRequired("platform")
 

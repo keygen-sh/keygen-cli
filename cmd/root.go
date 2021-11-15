@@ -30,7 +30,7 @@ type CommandOptions struct {
 	version          string
 	platform         string
 	channel          string
-	constraints      []string
+	entitlements     []string
 	signature        string
 	checksum         string
 	signingAlgorithm string

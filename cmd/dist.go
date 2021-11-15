@@ -50,7 +50,7 @@ func init() {
 	distCmd.Flags().StringVar(&distOpts.signingKey, "signing-key", "", "path to ed25519 private key for signing the release")
 
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
-	distCmd.Flags().StringSliceVar(&distOpts.constraints, "constraints", []string{}, "comma seperated list of entitlement identifiers (e.g. --constraints <id>,<id>,...)")
+	distCmd.Flags().StringSliceVar(&distOpts.entitlements, "entitlements", []string{}, "comma seperated list of entitlement constraints (e.g. --entitlements <id>,<id>,...)")
 
 	// TODO(ezekg) Add metadata flag
 
@@ -113,8 +113,8 @@ func distRun(cmd *cobra.Command, args []string) error {
 	platform := distOpts.platform
 
 	constraints := keygenext.Constraints{}
-	if c := distOpts.constraints; len(c) != 0 {
-		constraints = constraints.From(c)
+	if e := distOpts.entitlements; len(e) != 0 {
+		constraints = constraints.From(e)
 	}
 
 	var name *string

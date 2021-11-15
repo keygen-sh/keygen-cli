@@ -243,6 +243,12 @@ func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
 			return "", err
 		}
 	case "ed25519":
+		spinnerext.Pause()
+
+		fmt.Println("Warning: using ed25519 to sign large files is not recommended (use ed25519ph instead)")
+
+		spinnerext.Unpause()
+
 		b, err := ioutil.ReadAll(file)
 		if err != nil {
 			return "", err

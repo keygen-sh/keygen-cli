@@ -15,7 +15,6 @@ import (
 
 	"github.com/Masterminds/semver"
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
-	"github.com/keygen-sh/keygen-cli/internal/spinnerext"
 	"github.com/mitchellh/go-homedir"
 	"github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
 	"github.com/spf13/cobra"
@@ -52,6 +51,7 @@ func init() {
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
 	distCmd.Flags().StringSliceVar(&distOpts.entitlements, "entitlements", []string{}, "comma seperated list of entitlement constraints (e.g. --entitlements <id>,<id>,...)")
 
+	// TODO(ezekg) Use bubbletea to allow multi-line description?
 	// TODO(ezekg) Add metadata flag
 
 	distCmd.MarkFlagRequired("account")
@@ -72,8 +72,6 @@ func distArgs(cmd *cobra.Command, args []string) error {
 }
 
 func distRun(cmd *cobra.Command, args []string) error {
-	spinnerext.Start()
-
 	// TODO(ezekg) Add no-auto-upgrade flag
 	err := upgradeRun(nil, nil)
 	if err != nil {
@@ -137,8 +135,6 @@ func distRun(cmd *cobra.Command, args []string) error {
 
 	checksum := distOpts.checksum
 	if checksum == "" {
-		spinnerext.Text("generating checksum for release...")
-
 		checksum, err = calculateChecksum(file)
 		if err != nil {
 			return err
@@ -147,8 +143,6 @@ func distRun(cmd *cobra.Command, args []string) error {
 
 	signature := distOpts.signature
 	if pk := distOpts.signingKey; pk != "" && signature == "" {
-		spinnerext.Text("generating signature for release...")
-
 		path, err := homedir.Expand(pk)
 		if err != nil {
 			return fmt.Errorf(`signing-key "%s" is not expandable (%s)`, pk, err)
@@ -175,20 +169,18 @@ func distRun(cmd *cobra.Command, args []string) error {
 		Constraints: constraints,
 	}
 
-	// TODO(ezekg) Should we do a Create() unless a --upsert flag is given?
-	spinnerext.Text("creating release object...")
+	fmt.Println("publishing release...")
 
+	// TODO(ezekg) Should we do a Create() unless a --upsert flag is given?
 	if err := release.Upsert(); err != nil {
 		return err
 	}
-
-	spinnerext.Text("uploading release artifact...")
 
 	if err := release.Upload(file); err != nil {
 		return err
 	}
 
-	spinnerext.Stop(`successfully published release "` + release.ID + `"`)
+	fmt.Println(`successfully published release "` + release.ID + `"`)
 
 	return nil
 }
@@ -243,11 +235,7 @@ func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
 			return "", err
 		}
 	case "ed25519":
-		spinnerext.Pause()
-
-		fmt.Println("Warning: using ed25519 to sign large files is not recommended (use ed25519ph instead)")
-
-		spinnerext.Unpause()
+		fmt.Println("warning: using ed25519 to sign large files is not recommended (use ed25519ph instead)")
 
 		b, err := ioutil.ReadAll(file)
 		if err != nil {

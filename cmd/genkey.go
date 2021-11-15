@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/keygen-sh/keygen-cli/internal/spinnerext"
 	"github.com/mitchellh/go-homedir"
 	"github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
 	"github.com/spf13/cobra"
@@ -33,8 +32,6 @@ func init() {
 }
 
 func genkeyRun(cmd *cobra.Command, args []string) error {
-	spinnerext.Start()
-
 	signingKeyPath, err := homedir.Expand(genkeyOpts.signingKey)
 	if err != nil {
 		return fmt.Errorf(`path "%s" is not expandable (%s)`, genkeyOpts.signingKey, err)
@@ -53,20 +50,14 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf(`verify key file "%s" already exists`, verifyKeyPath)
 	}
 
-	spinnerext.Text("generating key pair...")
-
 	verifyKey, signingKey, err := ed25519.GenerateKey(nil)
 	if err != nil {
 		return err
 	}
 
-	spinnerext.Text("writing signing key to file...")
-
 	if err := writeSigningKeyFile(signingKeyPath, signingKey); err != nil {
 		return err
 	}
-
-	spinnerext.Text("writing verify key to file...")
 
 	if err := writeVerifyKeyFile(verifyKeyPath, verifyKey); err != nil {
 		return err
@@ -80,15 +71,14 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 		verifyKeyPath = abs
 	}
 
-	msg := fmt.Sprintf(`Private publishing key: %s
+	fmt.Printf(`Private publishing key: %s
 Public upgrade key: %s
 
-Warning: never share your publishing key, it's a secret!`,
+Warning: never share your publishing key, it's a secret!
+`,
 		signingKeyPath,
 		verifyKeyPath,
 	)
-
-	spinnerext.Stop(msg)
 
 	return nil
 }

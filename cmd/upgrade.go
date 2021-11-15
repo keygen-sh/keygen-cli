@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/keygen-sh/keygen-cli/internal/spinnerext"
 	"github.com/keygen-sh/keygen-go"
 	"github.com/mattn/go-tty"
 	"github.com/spf13/cobra"
@@ -45,25 +44,17 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 	}
 	defer tty.Close()
 
-	if cmd != nil {
-		spinnerext.Start()
-	}
-
-	spinnerext.Text("checking for upgrade...")
-
 	release, err := keygen.Upgrade(Version)
 	switch {
 	case err == keygen.ErrUpgradeNotAvailable:
 		if cmd != nil {
-			spinnerext.Stop("all up to date!")
+			fmt.Println("all up to date!")
 		}
 
 		return nil
 	case err != nil:
 		return err
 	}
-
-	spinnerext.Pause()
 
 	fmt.Printf("an upgrade is available! would you like to install v" + release.Version + " now? Y/n ")
 
@@ -72,24 +63,22 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	spinnerext.Unpause()
+	fmt.Println()
 
 	if k := KeyboardKey(r); k != KeyboardKeyEnter && k != KeyboardKeyY {
 		if cmd != nil {
-			spinnerext.Stop("upgrade aborted")
+			fmt.Println("upgrade aborted")
 		}
 
 		return nil
 	}
-
-	spinnerext.Text("installing upgrade...")
 
 	if err := release.Install(); err != nil {
 		return err
 	}
 
 	if cmd != nil {
-		spinnerext.Stop("install complete! now on v" + release.Version)
+		fmt.Println("install complete! now on v" + release.Version)
 	}
 
 	return nil

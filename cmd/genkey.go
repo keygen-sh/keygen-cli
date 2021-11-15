@@ -71,10 +71,10 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 		verifyKeyPath = abs
 	}
 
-	fmt.Printf(`Private publishing key: %s
-Public upgrade key: %s
+	fmt.Printf(`private signing key: %s
+public upgrade key: %s
 
-Warning: never share your publishing key, it's a secret!
+warning: never share your signing key -- it's a secret!
 `,
 		signingKeyPath,
 		verifyKeyPath,

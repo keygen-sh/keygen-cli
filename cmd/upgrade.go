@@ -9,6 +9,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type KeyboardKey rune
+
+var (
+	KeyboardKeyEnter KeyboardKey = 13
+	KeyboardKeyY     KeyboardKey = 121
+)
+
 var (
 	upgradeCmd = &cobra.Command{
 		Use:   "upgrade",
@@ -33,6 +40,7 @@ func init() {
 func upgradeRun(cmd *cobra.Command, args []string) error {
 	tty, err := tty.Open()
 	if err != nil {
+		// Skip for non-TTYs
 		return nil
 	}
 	defer tty.Close()
@@ -52,24 +60,21 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 
 		return nil
 	case err != nil:
-		if cmd != nil {
-			return err
-		}
-
-		return nil
+		return err
 	}
 
 	spinnerext.Pause()
 
 	fmt.Printf("an upgrade is available! would you like to install v" + release.Version + " now? Y/n ")
 
-	r, _ := tty.ReadRune()
+	r, err := tty.ReadRune()
+	if err != nil {
+		return err
+	}
 
 	spinnerext.Unpause()
 
-	// 13  = <enter> (default Y)
-	// 121 = "y"
-	if r != 13 && r != 121 {
+	if k := KeyboardKey(r); k != KeyboardKeyEnter && k != KeyboardKeyY {
 		if cmd != nil {
 			spinnerext.Stop("upgrade aborted")
 		}

@@ -37,7 +37,10 @@ func (a *Artifact) SetData(to func(target interface{}) error) error {
 func (a *Artifact) Upload(file *os.File) error {
 	client := &http.Client{}
 
-	req, err := http.NewRequest("PUT", a.Location, bufio.NewReader(file))
+	size := 1 * 1024 * 1024 * 50 // 50 MB
+	reader := bufio.NewReaderSize(file, size)
+
+	req, err := http.NewRequest("PUT", a.Location, reader)
 	if err != nil {
 		return err
 	}

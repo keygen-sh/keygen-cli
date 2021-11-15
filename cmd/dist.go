@@ -169,8 +169,6 @@ func distRun(cmd *cobra.Command, args []string) error {
 		Constraints: constraints,
 	}
 
-	fmt.Println("publishing release...")
-
 	// TODO(ezekg) Should we do a Create() unless a --upsert flag is given?
 	if err := release.Upsert(); err != nil {
 		return err

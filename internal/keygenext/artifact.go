@@ -1,10 +1,9 @@
 package keygenext
 
 import (
-	"bufio"
 	"errors"
+	"io"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -34,11 +33,8 @@ func (a *Artifact) SetData(to func(target interface{}) error) error {
 	return to(a)
 }
 
-func (a *Artifact) Upload(file *os.File) error {
+func (a *Artifact) Upload(reader io.Reader) error {
 	client := &http.Client{}
-
-	bufsize := 1024 * 1024 * 50 // 50 MB
-	reader := bufio.NewReaderSize(file, bufsize)
 
 	req, err := http.NewRequest("PUT", a.Location, reader)
 	if err != nil {

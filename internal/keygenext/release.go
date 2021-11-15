@@ -1,7 +1,7 @@
 package keygenext
 
 import (
-	"os"
+	"io"
 
 	"github.com/keygen-sh/jsonapi-go"
 	"github.com/keygen-sh/keygen-go"
@@ -80,7 +80,7 @@ func (r *Release) Upsert() error {
 	return nil
 }
 
-func (r *Release) Upload(file *os.File) error {
+func (r *Release) Upload(reader io.Reader) error {
 	client := &keygen.Client{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent}
 	artifact := &Artifact{}
 
@@ -98,7 +98,7 @@ func (r *Release) Upload(file *os.File) error {
 	artifact.ContentLength = r.Filesize
 	artifact.Location = res.Headers.Get("Location")
 
-	err = artifact.Upload(file)
+	err = artifact.Upload(reader)
 	if err != nil {
 		return err
 	}

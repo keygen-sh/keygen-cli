@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"crypto"
 	"crypto/sha512"
 	"encoding/base64"
@@ -12,12 +13,15 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/Masterminds/semver"
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
 	"github.com/mitchellh/go-homedir"
 	"github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
 	"github.com/spf13/cobra"
+	"github.com/vbauerster/mpb/v7"
+	"github.com/vbauerster/mpb/v7/decor"
 )
 
 var (
@@ -207,9 +211,37 @@ func distRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	if err := release.Upload(file); err != nil {
+	// Create a progress bar for file upload
+	progress := mpb.New(
+		mpb.WithWidth(60),
+		mpb.WithRefreshRate(180*time.Millisecond),
+	)
+
+	bar := progress.Add(release.Filesize,
+		mpb.NewBarFiller(mpb.BarStyle().Rbound("|")),
+		mpb.PrependDecorators(
+			decor.CountersKibiByte("% .2f / % .2f"),
+		),
+		mpb.AppendDecorators(
+			decor.EwmaETA(decor.ET_STYLE_GO, 90),
+			decor.Name(" ] "),
+			decor.EwmaSpeed(decor.UnitKiB, "% .2f", 60),
+		),
+	)
+
+	// Create a buffered reader to limit memory footprint
+	bufsize := 1024 * 1024 * 50 // 50 MB
+	bufreader := bufio.NewReaderSize(file, bufsize)
+
+	// Create proxy reader
+	reader := bar.ProxyReader(bufreader)
+	defer reader.Close()
+
+	if err := release.Upload(reader); err != nil {
 		return err
 	}
+
+	progress.Wait()
 
 	fmt.Println(`successfully published release "` + release.ID + `"`)
 

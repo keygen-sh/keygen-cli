@@ -1,5 +1,7 @@
 # Keygen CLI
 
+For all available commands and options, run `keygen --help`.
+
 ## Generate a key pair
 
 Generate an Ed25519 public/private key pair. The private key will be used to

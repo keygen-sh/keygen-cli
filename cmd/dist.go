@@ -235,8 +235,10 @@ func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
 			return "", err
 		}
 
+		opts := &ed25519.Options{Hash: crypto.SHA512, Context: keygenext.Product}
 		digest := h.Sum(nil)
-		sig, err = signingKey.Sign(nil, digest, &ed25519.Options{Hash: crypto.SHA512})
+
+		sig, err = signingKey.Sign(nil, digest, opts)
 		if err != nil {
 			return "", err
 		}

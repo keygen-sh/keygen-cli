@@ -46,7 +46,7 @@ func init() {
 	distCmd.Flags().StringVar(&distOpts.signature, "signature", "", "pre-calculated signature for the release (defaults using ed25519ph)")
 	distCmd.Flags().StringVar(&distOpts.checksum, "checksum", "", "pre-calculated checksum for the release (defaults using sha-512)")
 	distCmd.Flags().StringVar(&distOpts.signingAlgorithm, "signing-algorithm", "ed25519ph", "the signing algorithm to use, one of: ed25519ph, ed25519")
-	distCmd.Flags().StringVar(&distOpts.signingKey, "signing-key", "", "path to ed25519 private key for signing the release")
+	distCmd.Flags().StringVar(&distOpts.signingKey, "signing-key", "", "path to ed25519 private key for signing the release [$KEYGEN_SIGNING_KEY]")
 
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
 	distCmd.Flags().StringSliceVar(&distOpts.entitlements, "entitlements", []string{}, "comma seperated list of entitlement constraints (e.g. --entitlements <id>,<id>,...)")
@@ -69,6 +69,12 @@ func init() {
 	if v := os.Getenv("KEYGEN_PRODUCT_TOKEN"); v != "" {
 		if keygenext.Token == "" {
 			keygenext.Token = v
+		}
+	}
+
+	if v := os.Getenv("KEYGEN_SIGNING_KEY"); v != "" {
+		if distOpts.signingKey == "" {
+			distOpts.signingKey = v
 		}
 	}
 

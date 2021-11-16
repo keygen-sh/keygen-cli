@@ -6,6 +6,7 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/keygen-sh/jsonapi-go v1.1.0
 	github.com/keygen-sh/keygen-go v1.10.0
+	github.com/mattn/go-isatty v0.0.10
 	github.com/mattn/go-tty v0.0.3
 	github.com/mitchellh/go-homedir v1.0.0
 	github.com/oasisprotocol/curve25519-voi v0.0.0-20211102120939-d5a936accd94
@@ -19,7 +20,6 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/keygen-sh/go-update v1.0.0 // indirect
-	github.com/mattn/go-isatty v0.0.10 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect

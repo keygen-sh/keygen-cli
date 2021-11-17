@@ -3,11 +3,14 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/eiannone/keyboard"
 	"github.com/keygen-sh/keygen-go"
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
+	"github.com/vbauerster/mpb/v7"
+	"github.com/vbauerster/mpb/v7/decor"
 )
 
 type KeyCode rune
@@ -72,9 +75,25 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
+	frames := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
+	style := mpb.SpinnerStyle(frames...)
+	style.PositionLeft()
+
+	progress := mpb.New(mpb.WithWidth(1), mpb.WithRefreshRate(180*time.Millisecond))
+	spinner := progress.Add(1,
+		mpb.NewBarFiller(style),
+		mpb.BarRemoveOnComplete(),
+		mpb.AppendDecorators(
+			decor.Name("installing..."),
+		),
+	)
+
 	if err := release.Install(); err != nil {
 		return err
 	}
+
+	spinner.Increment()
+	progress.Wait()
 
 	if cmd != nil {
 		fmt.Println("install complete! now on v" + release.Version)

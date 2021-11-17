@@ -222,6 +222,7 @@ func distRun(cmd *cobra.Command, args []string) error {
 		bar := progress.Add(
 			release.Filesize,
 			mpb.NewBarFiller(mpb.BarStyle().Rbound("|")),
+			mpb.BarRemoveOnComplete(),
 			mpb.PrependDecorators(
 				decor.CountersKibiByte("% .2f / % .2f"),
 			),
@@ -248,7 +249,7 @@ func distRun(cmd *cobra.Command, args []string) error {
 		progress.Wait()
 	}
 
-	fmt.Println(`successfully published release "` + release.ID + `"`)
+	fmt.Println("published release " + release.ID)
 
 	return nil
 }

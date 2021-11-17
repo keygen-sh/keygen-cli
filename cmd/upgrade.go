@@ -2,17 +2,19 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/eiannone/keyboard"
 	"github.com/keygen-sh/keygen-go"
-	"github.com/mattn/go-tty"
+	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
 )
 
-type KeyboardKey rune
+type KeyCode rune
 
 var (
-	KeyboardKeyEnter KeyboardKey = 13
-	KeyboardKeyY     KeyboardKey = 121
+	KeyCodeEnter KeyCode = 13
+	KeyCodeY     KeyCode = 121
 )
 
 var (
@@ -37,12 +39,9 @@ func init() {
 }
 
 func upgradeRun(cmd *cobra.Command, args []string) error {
-	tty, err := tty.Open()
-	if err != nil {
-		// Skip for non-TTYs
+	if !isatty.IsTerminal(os.Stdout.Fd()) && !isatty.IsCygwinTerminal(os.Stdout.Fd()) {
 		return nil
 	}
-	defer tty.Close()
 
 	release, err := keygen.Upgrade(Version)
 	switch {
@@ -58,14 +57,14 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("an upgrade is available! would you like to install v" + release.Version + " now? Y/n ")
 
-	r, err := tty.ReadRune()
+	key, _, err := keyboard.GetSingleKey()
 	if err != nil {
 		return err
 	}
 
 	fmt.Println()
 
-	if k := KeyboardKey(r); k != KeyboardKeyEnter && k != KeyboardKeyY {
+	if k := KeyCode(key); k != KeyCodeEnter && k != KeyCodeY {
 		if cmd != nil {
 			fmt.Println("upgrade aborted")
 		}

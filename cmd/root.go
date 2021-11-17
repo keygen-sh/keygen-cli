@@ -9,7 +9,7 @@ import (
 
 const (
 	// The current version of the CLI.
-	Version = "1.0.0"
+	Version = "1.0.0-beta.1"
 )
 
 var (

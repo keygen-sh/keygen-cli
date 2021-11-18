@@ -25,6 +25,7 @@ var (
 
 type CommandOptions struct {
 	filename         string
+	filetype         string
 	name             string
 	description      string
 	version          string

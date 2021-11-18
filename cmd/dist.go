@@ -43,6 +43,7 @@ func init() {
 	distCmd.Flags().StringVar(&keygenext.Product, "product", "", "your keygen.sh product identifier [$KEYGEN_PRODUCT_ID] (required)")
 	distCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product token [$KEYGEN_PRODUCT_TOKEN] (required)")
 	distCmd.Flags().StringVar(&distOpts.filename, "filename", "", "filename for the release (default is filename from <path>)")
+	distCmd.Flags().StringVar(&distOpts.filetype, "filetype", "", "filetype for the release (default is extname from <path>)")
 	distCmd.Flags().StringVar(&distOpts.version, "version", "", "version for the release (required)")
 	distCmd.Flags().StringVar(&distOpts.name, "name", "", "human-readable name for the release")
 	distCmd.Flags().StringVar(&distOpts.description, "description", "", "description for the release (e.g. release notes)")
@@ -140,7 +141,11 @@ func distRun(cmd *cobra.Command, args []string) error {
 	filesize := info.Size()
 	filetype := filepath.Ext(filename)
 	if filetype == "" {
-		filetype = "bin"
+		if distOpts.filetype != "" {
+			filetype = distOpts.filetype
+		} else {
+			filetype = "bin"
+		}
 	}
 
 	// Allow filename to be overridden

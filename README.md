@@ -1,8 +1,22 @@
 # Keygen CLI
 
+CLI to interact with keygen.sh.
+
+## Installation
+
+To install the `keygen` CLI, you can run the following script. Alternatively,
+you can install manually by downloading a binary and following [the install
+instructions here](https://keygen.sh/docs/cli/).
+
+```bash
+curl -sSL https://bin.keygen.sh/keygen/cli/install.sh | sh
+```
+
+## Commands
+
 For all available commands and options, run `keygen --help`.
 
-## Generate a key pair
+### Generate a key pair
 
 Generate an Ed25519 public/private key pair. The private key will be used to
 sign releases, and the public key will be used to verify upgrades within your
@@ -17,7 +31,7 @@ keygen genkey
 
 For more usage options run `keygen genkey --help`.
 
-## Publish a release
+### Publish a release
 
 Publish a new release. This command will create a new release object, and then
 upload the file at `<path>` to the release's artifact relationship. When the

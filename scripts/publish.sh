@@ -17,7 +17,7 @@ main() {
       <<<$(echo "${platform}" | tr '/' ' ')
 
     filename="keygen_${os}_${arch}_${version}"
-    if [ "${os}" == 'windows' ]
+    if [ "${os}" = 'windows' ]
     then
       filename="${filename}.exe"
     fi
@@ -40,7 +40,7 @@ main() {
   done
 
   # We only want to update these releases for stable releases
-  if [ "${CHANNEL}" == 'stable' ]
+  if [ "${CHANNEL}" = 'stable' ]
   then
     keygen dist "build/install.sh" \
       --filename "cli/install.sh" \

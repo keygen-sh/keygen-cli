@@ -22,7 +22,7 @@ main() {
       <<<$(echo "${platform}" | tr '/' ' ')
 
     filename="keygen_${os}_${arch}_${version}"
-    if [ "${os}" == 'windows' ]
+    if [ "${os}" = 'windows' ]
     then
       filename="${filename}.exe"
     fi

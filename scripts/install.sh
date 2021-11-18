@@ -22,7 +22,7 @@ get_os() {
     ;;
   esac
 
-  if [[ -z "${os}" ]]
+  if [ -z "${os}" ]
   then
     log_fatal 'unable to detect operating system'
   fi
@@ -52,7 +52,7 @@ get_arch() {
     ;;
   esac
 
-  if [[ -z "${arch}" ]]
+  if [ -z "${arch}" ]
   then
     log_fatal 'unable to detect architecture'
   fi
@@ -74,7 +74,7 @@ get_bin_url() {
   version=$(echo "${BIN_VERSION}" | sed 's/[-.+]/_/g')
 
   filename="keygen_${OS}_${ARCH}_${version}"
-  if [ "${os}" == 'windows' ]
+  if [ "${os}" = 'windows' ]
   then
     filename="${filename}.exe"
   fi

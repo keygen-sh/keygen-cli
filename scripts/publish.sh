@@ -59,6 +59,7 @@ main() {
 
 PLATFORMS=$(go tool dist list | grep -vE 'ios|android|js|aix|illumos|riscv64|plan9|solaris')
 VERSION=$(cat VERSION)
+CHANNEL='stable'
 
 case "${VERSION}"
 in
@@ -73,9 +74,6 @@ in
     ;;
   *-dev.*)
     CHANNEL='dev'
-    ;;
-  *)
-    CHANNEL='stable'
     ;;
 esac
 

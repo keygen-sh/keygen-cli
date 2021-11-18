@@ -55,7 +55,11 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 
 		return nil
 	case err != nil:
-		return err
+		if cmd != nil {
+			return err
+		}
+
+		return nil
 	}
 
 	fmt.Printf("an upgrade is available! would you like to install v" + release.Version + " now? Y/n ")

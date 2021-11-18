@@ -7,11 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	// The current version of the CLI.
-	Version = "1.0.0-beta.1"
-)
-
 var (
 	rootCmd = &cobra.Command{
 		Use:     "keygen",

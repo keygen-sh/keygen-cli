@@ -7,7 +7,7 @@ require (
 	github.com/eiannone/keyboard v0.0.0-20200508000154-caf4b762e807
 	github.com/keygen-sh/jsonapi-go v1.1.0
 	github.com/keygen-sh/keygen-go v1.11.0
-	github.com/mattn/go-isatty v0.0.10
+	github.com/mattn/go-isatty v0.0.14
 	github.com/mitchellh/go-homedir v1.0.0
 	github.com/oasisprotocol/curve25519-voi v0.0.0-20211102120939-d5a936accd94
 	github.com/spf13/cobra v1.2.1

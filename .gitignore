@@ -2,6 +2,7 @@
 !/build/.keep
 
 keygen-cli
+keygen
 cli
 
 *.key

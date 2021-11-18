@@ -7,6 +7,11 @@ import (
 )
 
 var (
+	// The current version of the CLI, embedded at compile time.
+	Version string
+)
+
+var (
 	versionCmd = &cobra.Command{
 		Use:   "version",
 		Short: "print the current CLI version",

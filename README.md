@@ -9,7 +9,7 @@ you can install manually by downloading a binary and following [the install
 instructions here](https://keygen.sh/docs/cli/).
 
 ```bash
-curl -sSL https://bin.keygen.sh/keygen/cli/install.sh | sh
+curl -sSL https://get.keygen.sh/keygen/cli/install.sh | sh
 ```
 
 ## Commands

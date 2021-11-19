@@ -74,7 +74,7 @@ get_tmp_path() {
 }
 
 get_bin_version() {
-  version=$(curl -sSL 'https://bin.keygen.sh/keygen/cli/version')
+  version=$(curl -sSL 'https://get.keygen.sh/keygen/cli/version')
   if [ -z "${version}" ]
   then
     log_err 'unable to get latest version'
@@ -92,7 +92,7 @@ get_bin_url() {
     filename="${filename}.exe"
   fi
 
-  echo "https://bin.keygen.sh/keygen/cli/${filename}"
+  echo "https://get.keygen.sh/keygen/cli/${filename}"
 }
 
 assert_os_support() {

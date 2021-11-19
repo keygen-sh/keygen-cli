@@ -324,7 +324,6 @@ func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
 			return "", err
 		}
 
-		// TODO(ezekg) Validate key size to guard against Sign panicing
 		sig, err = signingKey.Sign(nil, b, &ed25519.Options{})
 		if err != nil {
 			return "", err

@@ -5,5 +5,6 @@ keygen-cli
 keygen
 cli
 
+*.exe
 *.key
 *.pub

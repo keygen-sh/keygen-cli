@@ -1,11 +1,11 @@
 #!/bin/sh
 
 log_info() {
-  echo "info: $1"
+  echo "[info] $1"
 }
 
 log_err() {
-  echo "error: $1"
+  echo "[error] $1"
   exit 1
 }
 

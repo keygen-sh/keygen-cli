@@ -1,11 +1,11 @@
 #!/bin/sh
 
 log_info() {
-  echo "info: ${1}"
+  echo "[info] ${1}"
 }
 
 log_err() {
-  echo "error: ${1} (please install manually via https://keygen.sh/docs/cli/)"
+  echo "[error] ${1} (please install manually via https://keygen.sh/docs/cli/)"
   exit 1
 }
 
@@ -14,7 +14,7 @@ get_os() {
 
   case "${os}"
   in
-  msys*)
+  msys*|mingw*)
     os='windows'
     ;;
   cygwin*)
@@ -73,6 +73,26 @@ get_tmp_path() {
   echo "${path}/${BIN_NAME}"
 }
 
+get_bin_name() {
+  name='keygen'
+  if [ "${OS}" = 'windows' ]
+  then
+    name="${name}.exe"
+  fi
+
+  echo "${name}"
+}
+
+get_bin_path() {
+  path="/usr/local/bin/${BIN_NAME}"
+  if [ "${OS}" = 'windows' ]
+  then
+    path="./${BIN_NAME}"
+  fi
+
+  echo "${path}"
+}
+
 get_bin_version() {
   version=$(curl -sSL 'https://get.keygen.sh/keygen/cli/version')
   if [ -z "${version}" ]
@@ -87,7 +107,7 @@ get_bin_url() {
   version=$(echo "${BIN_VERSION}" | sed 's/[-.+]/_/g')
 
   filename="keygen_${OS}_${ARCH}_${version}"
-  if [ "${os}" = 'windows' ]
+  if [ "${OS}" = 'windows' ]
   then
     filename="${filename}.exe"
   fi
@@ -141,9 +161,9 @@ main() {
 
   if [ "${status}" -eq 200 ]
   then
-    log_info "successfully downloaded v${BIN_VERSION} for ${PLATFORM}"
+    log_info "successfully downloaded v${BIN_VERSION} for ${PLATFORM}: ${BIN_TMP}"
   else
-    log_err "failed to download v${BIN_VERSION} for ${PLATFORM}"
+    log_err "failed to download v${BIN_VERSION} for ${PLATFORM}: ${status}"
   fi
 
   mv "${BIN_TMP}" "${BIN_PATH}" && \
@@ -151,7 +171,7 @@ main() {
 
   if [ $? -eq 0 ]
   then
-    log_info "successfully installed v${BIN_VERSION} for ${PLATFORM}"
+    log_info "successfully installed v${BIN_VERSION} for ${PLATFORM}: ${BIN_PATH}"
   else
     log_err "failed to installed v${BIN_VERSION} for ${PLATFORM}"
   fi
@@ -163,8 +183,8 @@ OS=$(get_os)
 ARCH=$(get_arch)
 PLATFORM="${OS}/${ARCH}"
 BIN_VERSION=$(get_bin_version)
-BIN_NAME='keygen'
-BIN_PATH="/usr/local/bin/${BIN_NAME}"
+BIN_NAME=$(get_bin_name)
+BIN_PATH=$(get_bin_path)
 BIN_TMP=$(get_tmp_path)
 BIN_URL=$(get_bin_url)
 

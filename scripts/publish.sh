@@ -29,7 +29,8 @@ main() {
       --name "CLI v${VERSION}" \
       --platform "${platform}" \
       --channel "${CHANNEL}" \
-      --version "${VERSION}"
+      --version "${VERSION}" \
+      --no-auto-upgrade
 
     if [ $? -eq 0 ]
     then
@@ -46,14 +47,16 @@ main() {
       --filename "cli/install.sh" \
       --name "CLI Installer" \
       --platform '*' \
-      --version "${VERSION}"
+      --version "${VERSION}" \
+      --no-auto-upgrade
 
     keygen dist "build/version" \
       --filename "cli/version" \
       --filetype 'txt' \
       --name "CLI Version" \
       --platform '*' \
-      --version "${VERSION}"
+      --version "${VERSION}" \
+      --no-auto-upgrade
   fi
 }
 

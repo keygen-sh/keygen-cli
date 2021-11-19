@@ -53,6 +53,7 @@ func init() {
 	distCmd.Flags().StringVar(&distOpts.checksum, "checksum", "", "pre-calculated checksum for the release (defaults using sha-512)")
 	distCmd.Flags().StringVar(&distOpts.signingAlgorithm, "signing-algorithm", "ed25519ph", "the signing algorithm to use, one of: ed25519ph, ed25519")
 	distCmd.Flags().StringVar(&distOpts.signingKey, "signing-key", "", "path to ed25519 private key for signing the release [$KEYGEN_SIGNING_KEY]")
+	distCmd.Flags().BoolVar(&distOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE]")
 
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
 	distCmd.Flags().StringSliceVar(&distOpts.entitlements, "entitlements", []string{}, "comma seperated list of entitlement constraints (e.g. --entitlements <id>,<id>,...)")
@@ -84,6 +85,12 @@ func init() {
 		}
 	}
 
+	if v := os.Getenv("KEYGEN_NO_AUTO_UPGRADE"); v != "" {
+		if !distOpts.noAutoUpgrade {
+			distOpts.noAutoUpgrade = v == "1" || v == "true"
+		}
+	}
+
 	if keygenext.Account == "" {
 		distCmd.MarkFlagRequired("account")
 	}
@@ -111,10 +118,11 @@ func distArgs(cmd *cobra.Command, args []string) error {
 }
 
 func distRun(cmd *cobra.Command, args []string) error {
-	// TODO(ezekg) Add no-auto-upgrade flag
-	err := upgradeRun(nil, nil)
-	if err != nil {
-		return err
+	if !distOpts.noAutoUpgrade {
+		err := upgradeRun(nil, nil)
+		if err != nil {
+			return err
+		}
 	}
 
 	path, err := homedir.Expand(args[0])

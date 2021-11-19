@@ -32,6 +32,7 @@ type CommandOptions struct {
 	signingAlgorithm string
 	signingKey       string
 	verifyKey        string
+	noAutoUpgrade    bool
 }
 
 func init() {

@@ -24,7 +24,7 @@ get_os() {
 
   if [ -z "${os}" ]
   then
-    log_fatal 'unable to detect operating system'
+    log_err 'unable to detect operating system'
   fi
 
   echo "${os}"
@@ -57,20 +57,30 @@ get_arch() {
 
   if [ -z "${arch}" ]
   then
-    log_fatal 'unable to detect architecture'
+    log_err 'unable to detect architecture'
   fi
 
   echo "${arch}"
 }
 
-get_bin_version() {
-  version=$(curl -sSL 'https://bin.keygen.sh/keygen/cli/version')
+get_tmp_path() {
+  path=$(mktemp -d /tmp/keygen.XXXXXXXXXX)
+  if [ -z "${path}" ]
+  then
+    log_err 'unable to make tmp install path'
+  fi
 
-  echo "${version}"
+  echo "${path}/${BIN_NAME}"
 }
 
-get_bin_path() {
-  echo '/usr/local/bin/keygen'
+get_bin_version() {
+  version=$(curl -sSL 'https://bin.keygen.sh/keygen/cli/version')
+  if [ -z "${version}" ]
+  then
+    log_err 'unable to get latest version'
+  fi
+
+  echo "${version}"
 }
 
 get_bin_url() {
@@ -88,13 +98,13 @@ get_bin_url() {
 assert_os_support() {
   case "${OS}"
   in
-    darwin) return ;;
+    darwin)    return ;;
     dragonfly) return ;;
-    freebsd) return ;;
-    linux) return ;;
-    netbsd) return ;;
-    openbsd) return ;;
-    windows) return ;;
+    freebsd)   return ;;
+    linux)     return ;;
+    netbsd)    return ;;
+    openbsd)   return ;;
+    windows)   return ;;
   esac
 
   log_err "unsupported operating system: ${OS}"
@@ -103,17 +113,17 @@ assert_os_support() {
 assert_arch_support() {
   case "${ARCH}"
   in
-    386) return ;;
-    amd64) return ;;
-    arm64) return ;;
-    arm) return ;;
-    ppc64) return ;;
-    ppc64le) return ;;
-    mips) return ;;
-    mipsle) return ;;
-    mips64) return ;;
+    386)      return ;;
+    amd64)    return ;;
+    arm64)    return ;;
+    arm)      return ;;
+    ppc64)    return ;;
+    ppc64le)  return ;;
+    mips)     return ;;
+    mipsle)   return ;;
+    mips64)   return ;;
     mips64le) return ;;
-    s390x) return ;;
+    s390x)    return ;;
   esac
 
   log_err "unsupported architecture: ${ARCH}"
@@ -127,7 +137,7 @@ assert_platform_support() {
 main() {
   assert_platform_support
 
-  status=$(curl -sSL "${BIN_URL}" --write-out "%{http_code}" -o keygen)
+  status=$(curl -sSL "${BIN_URL}" --write-out "%{http_code}" -o "${BIN_TMP}")
 
   if [ "${status}" -eq 200 ]
   then
@@ -136,7 +146,7 @@ main() {
     log_err "failed to download v${BIN_VERSION} for ${PLATFORM}"
   fi
 
-  mv keygen "${BIN_PATH}" && \
+  mv "${BIN_TMP}" "${BIN_PATH}" && \
     chmod +x "${BIN_PATH}"
 
   if [ $? -eq 0 ]
@@ -153,7 +163,9 @@ OS=$(get_os)
 ARCH=$(get_arch)
 PLATFORM="${OS}/${ARCH}"
 BIN_VERSION=$(get_bin_version)
-BIN_PATH=$(get_bin_path)
+BIN_NAME='keygen'
+BIN_PATH="/usr/local/bin/${BIN_NAME}"
+BIN_TMP=$(get_tmp_path)
 BIN_URL=$(get_bin_url)
 
 main

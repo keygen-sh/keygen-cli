@@ -44,6 +44,9 @@ get_arch() {
   aarch64)
     arch='arm64'
     ;;
+  armv8)
+    arch='arm64'
+    ;;
   armv*)
     arch='arm'
     ;;

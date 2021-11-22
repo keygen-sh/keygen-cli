@@ -42,8 +42,8 @@ func init() {
 	distCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID] (required)")
 	distCmd.Flags().StringVar(&keygenext.Product, "product", "", "your keygen.sh product identifier [$KEYGEN_PRODUCT_ID] (required)")
 	distCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product token [$KEYGEN_PRODUCT_TOKEN] (required)")
-	distCmd.Flags().StringVar(&distOpts.filename, "filename", "", "filename for the release (default is filename from <path>)")
-	distCmd.Flags().StringVar(&distOpts.filetype, "filetype", "", "filetype for the release (default is extname from <path>)")
+	distCmd.Flags().StringVar(&distOpts.filename, "filename", "", "filename for the release (default is basename of <path>)")
+	distCmd.Flags().StringVar(&distOpts.filetype, "filetype", "", "filetype for the release (default is extname of <path>)")
 	distCmd.Flags().StringVar(&distOpts.version, "version", "", "version for the release (required)")
 	distCmd.Flags().StringVar(&distOpts.name, "name", "", "human-readable name for the release")
 	distCmd.Flags().StringVar(&distOpts.description, "description", "", "description for the release (e.g. release notes)")
@@ -145,7 +145,7 @@ func distRun(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf(`path "%s" is a directory (must be a file)`, path)
 	}
 
-	filename := file.Name()
+	filename := filepath.Base(info.Name())
 	filesize := info.Size()
 	filetype := filepath.Ext(filename)
 	if filetype == "" {

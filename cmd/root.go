@@ -30,6 +30,7 @@ type CommandOptions struct {
 	signature        string
 	checksum         string
 	signingAlgorithm string
+	signingKeyPath   string
 	signingKey       string
 	verifyKey        string
 	noAutoUpgrade    bool

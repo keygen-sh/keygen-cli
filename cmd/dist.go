@@ -39,8 +39,8 @@ var (
 )
 
 func init() {
-	distCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID] (required)")
-	distCmd.Flags().StringVar(&keygenext.Product, "product", "", "your keygen.sh product identifier [$KEYGEN_PRODUCT_ID] (required)")
+	distCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID=<id>] (required)")
+	distCmd.Flags().StringVar(&keygenext.Product, "product", "", "your keygen.sh product identifier [$KEYGEN_PRODUCT_ID=<id>] (required)")
 	distCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product token [$KEYGEN_PRODUCT_TOKEN] (required)")
 	distCmd.Flags().StringVar(&distOpts.filename, "filename", "", "filename for the release (default is basename of <path>)")
 	distCmd.Flags().StringVar(&distOpts.filetype, "filetype", "", "filetype for the release (default is extname of <path>)")
@@ -52,8 +52,8 @@ func init() {
 	distCmd.Flags().StringVar(&distOpts.signature, "signature", "", "pre-calculated signature for the release (defaults using ed25519ph)")
 	distCmd.Flags().StringVar(&distOpts.checksum, "checksum", "", "pre-calculated checksum for the release (defaults using sha-512)")
 	distCmd.Flags().StringVar(&distOpts.signingAlgorithm, "signing-algorithm", "ed25519ph", "the signing algorithm to use, one of: ed25519ph, ed25519")
-	distCmd.Flags().StringVar(&distOpts.signingKey, "signing-key", "", "path to ed25519 private key for signing the release [$KEYGEN_SIGNING_KEY]")
-	distCmd.Flags().BoolVar(&distOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE]")
+	distCmd.Flags().StringVar(&distOpts.signingKeyPath, "signing-key", "", "path to ed25519 private key for signing the release [$KEYGEN_SIGNING_KEY_PATH=<path>, $KEYGEN_SIGNING_KEY=<key>]")
+	distCmd.Flags().BoolVar(&distOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
 	distCmd.Flags().StringSliceVar(&distOpts.entitlements, "entitlements", []string{}, "comma seperated list of entitlement constraints (e.g. --entitlements <id>,<id>,...)")
@@ -76,6 +76,12 @@ func init() {
 	if v := os.Getenv("KEYGEN_PRODUCT_TOKEN"); v != "" {
 		if keygenext.Token == "" {
 			keygenext.Token = v
+		}
+	}
+
+	if v := os.Getenv("KEYGEN_SIGNING_KEY_PATH"); v != "" {
+		if distOpts.signingKeyPath == "" {
+			distOpts.signingKeyPath = v
 		}
 	}
 
@@ -193,13 +199,27 @@ func distRun(cmd *cobra.Command, args []string) error {
 	}
 
 	signature := distOpts.signature
-	if pk := distOpts.signingKey; pk != "" && signature == "" {
-		path, err := homedir.Expand(pk)
-		if err != nil {
-			return fmt.Errorf(`signing-key "%s" is not expandable (%s)`, pk, err)
+	if signature == "" && (distOpts.signingKeyPath != "" || distOpts.signingKey != "") {
+		var key string
+
+		switch {
+		case distOpts.signingKeyPath != "":
+			path, err := homedir.Expand(distOpts.signingKeyPath)
+			if err != nil {
+				return fmt.Errorf(`signing-key path is not expandable (%s)`, err)
+			}
+
+			b, err := os.ReadFile(path)
+			if err != nil {
+				return fmt.Errorf(`signing-key path is not readable (%s)`, err)
+			}
+
+			key = string(b)
+		case distOpts.signingKey != "":
+			key = distOpts.signingKey
 		}
 
-		signature, err = calculateSignature(path, file)
+		signature, err = calculateSignature(key, file)
 		if err != nil {
 			return err
 		}
@@ -281,25 +301,21 @@ func calculateChecksum(file *os.File) (string, error) {
 	return base64.RawStdEncoding.EncodeToString(digest), nil
 }
 
-func calculateSignature(signingKeyPath string, file *os.File) (string, error) {
+func calculateSignature(encSigningKey string, file *os.File) (string, error) {
 	defer file.Seek(0, io.SeekStart) // reset reader
 
-	var signingKey ed25519.PrivateKey
-	encKey, err := os.ReadFile(signingKeyPath)
+	decSigningKey, err := hex.DecodeString(encSigningKey)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("bad signing key (%s)", err)
 	}
 
-	signingKey, err = hex.DecodeString(string(encKey))
-	if err != nil {
-		return "", err
+	if l := len(decSigningKey); l != ed25519.PrivateKeySize {
+		return "", fmt.Errorf("bad signing key length (got %d expected %d)", l, ed25519.PrivateKeySize)
 	}
 
-	if l := len(signingKey); l != ed25519.PrivateKeySize {
-		return "", fmt.Errorf("bad signing key length (got %d expected 64)", l)
-	}
-
+	signingKey := ed25519.PrivateKey(decSigningKey)
 	var sig []byte
+
 	switch distOpts.signingAlgorithm {
 	case "ed25519ph":
 		// We're using Ed25519ph which expects a pre-hashed message using SHA-512

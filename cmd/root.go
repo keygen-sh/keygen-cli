@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
@@ -9,9 +10,10 @@ import (
 
 var (
 	rootCmd = &cobra.Command{
-		Use:     "keygen",
-		Short:   "CLI to interact with keygen.sh",
-		Version: Version,
+		Use:           "keygen",
+		Short:         "CLI to interact with keygen.sh",
+		Version:       Version,
+		SilenceErrors: true,
 		CompletionOptions: cobra.CompletionOptions{
 			DisableDefaultCmd: true,
 		},
@@ -39,11 +41,15 @@ type CommandOptions struct {
 func init() {
 	keygenext.UserAgent = "cli/" + Version
 
+	rootCmd.InitDefaultVersionFlag()
+	rootCmd.InitDefaultHelpFlag()
+
 	rootCmd.SetHelpCommand(helpCmd)
 }
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
+		fmt.Printf("error: %s\n", err)
 		os.Exit(1)
 	}
 }

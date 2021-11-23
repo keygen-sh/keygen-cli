@@ -31,8 +31,8 @@ type CommandOptions struct {
 	checksum         string
 	signingAlgorithm string
 	signingKeyPath   string
+	verifyKeyPath    string
 	signingKey       string
-	verifyKey        string
 	noAutoUpgrade    bool
 }
 

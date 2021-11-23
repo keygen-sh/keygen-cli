@@ -25,21 +25,21 @@ var (
 )
 
 func init() {
-	genkeyCmd.Flags().StringVar(&genkeyOpts.signingKey, "out", "keygen.key", "output the private publishing key to specified file")
-	genkeyCmd.Flags().StringVar(&genkeyOpts.verifyKey, "pubout", "keygen.pub", "output the public upgrade key to specified file")
+	genkeyCmd.Flags().StringVar(&genkeyOpts.signingKeyPath, "out", "keygen.key", "output the private publishing key to specified file")
+	genkeyCmd.Flags().StringVar(&genkeyOpts.verifyKeyPath, "pubout", "keygen.pub", "output the public upgrade key to specified file")
 
 	rootCmd.AddCommand(genkeyCmd)
 }
 
 func genkeyRun(cmd *cobra.Command, args []string) error {
-	signingKeyPath, err := homedir.Expand(genkeyOpts.signingKey)
+	signingKeyPath, err := homedir.Expand(genkeyOpts.signingKeyPath)
 	if err != nil {
-		return fmt.Errorf(`path "%s" is not expandable (%s)`, genkeyOpts.signingKey, err)
+		return fmt.Errorf(`path "%s" is not expandable (%s)`, genkeyOpts.signingKeyPath, err)
 	}
 
-	verifyKeyPath, err := homedir.Expand(genkeyOpts.verifyKey)
+	verifyKeyPath, err := homedir.Expand(genkeyOpts.verifyKeyPath)
 	if err != nil {
-		return fmt.Errorf(`path "%s" is not expandable (%s)`, genkeyOpts.verifyKey, err)
+		return fmt.Errorf(`path "%s" is not expandable (%s)`, genkeyOpts.verifyKeyPath, err)
 	}
 
 	if _, err := os.Stat(signingKeyPath); err == nil {

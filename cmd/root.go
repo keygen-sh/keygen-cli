@@ -38,6 +38,8 @@ type CommandOptions struct {
 
 func init() {
 	keygenext.UserAgent = "cli/" + Version
+
+	rootCmd.SetHelpCommand(helpCmd)
 }
 
 func Execute() {

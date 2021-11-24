@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/eiannone/keyboard"
@@ -44,6 +45,22 @@ func init() {
 func upgradeRun(cmd *cobra.Command, args []string) error {
 	if !isatty.IsTerminal(os.Stdout.Fd()) && !isatty.IsCygwinTerminal(os.Stdout.Fd()) {
 		return nil
+	}
+
+	// When the upgrade command is not called directly, we only want to
+	// check periodically. To do so, we'll try to use a /tmp lockfile.
+	if cmd == nil {
+		path := filepath.Join(os.TempDir(), "keygen-auto-upgrade.lock")
+		info, err := os.Stat(path)
+		if err != nil {
+			f, _ := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0600)
+			defer f.Close()
+		} else {
+			// Check for upgrades at most once per hour
+			if time.Since(info.ModTime()) < time.Duration(1)*time.Hour {
+				return nil
+			}
+		}
 	}
 
 	release, err := keygen.Upgrade(Version)

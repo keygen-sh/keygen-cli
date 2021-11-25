@@ -60,6 +60,9 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 			if time.Since(info.ModTime()) < time.Duration(1)*time.Hour {
 				return nil
 			}
+
+			// Touch the lockfile
+			os.Chtimes(path, time.Now(), time.Now())
 		}
 	}
 

@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/fatih/color"
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
@@ -11,8 +12,12 @@ import (
 
 var (
 	rootCmd = &cobra.Command{
-		Use:           "keygen",
-		Short:         "CLI to interact with keygen.sh",
+		Use:   "keygen",
+		Short: "CLI to interact with keygen.sh",
+		Long: `CLI to interact with keygen.sh
+
+Version:
+  keygen/` + Version + " " + runtime.GOOS + "-" + runtime.GOARCH + " " + runtime.Version(),
 		Version:       Version,
 		SilenceErrors: true,
 		CompletionOptions: cobra.CompletionOptions{

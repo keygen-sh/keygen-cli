@@ -56,8 +56,8 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 			f, _ := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0600)
 			defer f.Close()
 		} else {
-			// Check for upgrades at most once per hour
-			if time.Since(info.ModTime()) < time.Duration(1)*time.Hour {
+			// Check for upgrades at most once per day
+			if time.Since(info.ModTime()) < time.Duration(24)*time.Hour {
 				return nil
 			}
 

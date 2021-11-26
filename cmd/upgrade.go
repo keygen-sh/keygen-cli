@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/eiannone/keyboard"
@@ -39,6 +40,19 @@ func init() {
 	keygen.PublicKey = "b8f3eb4cd260135f67a5096e8dc1c9b9dcb81ee9fe50d12cdcd941f6607a9031"
 	keygen.Account = "5cc3b5a2-0d08-4291-940b-41c21f0ba6ab"
 	keygen.Product = "0d5f0b57-3102-4ddf-beb9-f652cf8e24b7"
+
+	switch {
+	case strings.Contains(Version, "-rc."):
+		keygen.Channel = "rc"
+	case strings.Contains(Version, "-beta."):
+		keygen.Channel = "beta"
+	case strings.Contains(Version, "-alpha."):
+		keygen.Channel = "alpha"
+	case strings.Contains(Version, "-dev."):
+		keygen.Channel = "dev"
+	default:
+		keygen.Channel = "stable"
+	}
 
 	rootCmd.AddCommand(upgradeCmd)
 }

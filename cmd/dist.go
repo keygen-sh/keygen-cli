@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver"
+	"github.com/fatih/color"
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
 	"github.com/mattn/go-isatty"
 	"github.com/mitchellh/go-homedir"
@@ -282,7 +283,9 @@ func distRun(cmd *cobra.Command, args []string) error {
 		progress.Wait()
 	}
 
-	fmt.Println("published release " + release.ID)
+	italic := color.New(color.Italic).SprintFunc()
+
+	fmt.Println("published release " + italic(release.ID))
 
 	return nil
 }

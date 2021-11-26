@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/fatih/color"
 	"github.com/mitchellh/go-homedir"
 	"github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
 	"github.com/spf13/cobra"
@@ -71,14 +72,17 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 		verifyKeyPath = abs
 	}
 
+	yellow := color.New(color.FgYellow).SprintFunc()
+	italic := color.New(color.Italic).SprintFunc()
+
 	fmt.Printf(`private signing key: %s
 public upgrade key: %s
-
-warning: never share your signing key -- it's a secret!
 `,
 		signingKeyPath,
 		verifyKeyPath,
 	)
+
+	fmt.Fprintf(os.Stderr, yellow("warning:")+" never share your signing key -- "+italic("it's a secret!"))
 
 	return nil
 }

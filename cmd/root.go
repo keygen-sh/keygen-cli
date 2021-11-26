@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
 	"github.com/spf13/cobra"
 )
@@ -41,6 +42,8 @@ type CommandOptions struct {
 func init() {
 	keygenext.UserAgent = "cli/" + Version
 
+	rootCmd.PersistentFlags().BoolVar(&color.NoColor, "no-color", false, "disable colors in command output [$NO_COLOR=1]")
+
 	rootCmd.InitDefaultVersionFlag()
 	rootCmd.InitDefaultHelpFlag()
 
@@ -49,7 +52,10 @@ func init() {
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Printf("error: %s\n", err)
+		red := color.New(color.FgRed).SprintFunc()
+
+		fmt.Fprintln(os.Stderr, red("error:")+" "+err.Error())
+
 		os.Exit(1)
 	}
 }

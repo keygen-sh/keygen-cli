@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/eiannone/keyboard v0.0.0-20200508000154-caf4b762e807
+	github.com/fatih/color v1.7.0
 	github.com/keygen-sh/jsonapi-go v1.1.0
 	github.com/keygen-sh/keygen-go v1.11.0
 	github.com/mattn/go-isatty v0.0.14
@@ -20,6 +21,7 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/keygen-sh/go-update v1.0.0 // indirect
+	github.com/mattn/go-colorable v0.0.9 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect

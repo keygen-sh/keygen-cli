@@ -253,6 +253,17 @@ func distRun(cmd *cobra.Command, args []string) error {
 
 	// TODO(ezekg) Should we do a Create() unless a --upsert flag is given?
 	if err := release.Upsert(); err != nil {
+		e, ok := err.(*keygenext.APIError)
+		if ok {
+			italic := color.New(color.Italic).SprintFunc()
+			code := e.Code
+			if code == "" {
+				code = "API_ERROR"
+			}
+
+			return fmt.Errorf("%s - %s: %s", italic(code), e.Title, e.Detail)
+		}
+
 		return err
 	}
 

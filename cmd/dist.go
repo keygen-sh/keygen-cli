@@ -31,8 +31,18 @@ var (
 	distCmd  = &cobra.Command{
 		Use:   "dist <path>",
 		Short: "publish a new release for a product",
-		Args:  distArgs,
-		RunE:  distRun,
+		Example: `  keygen dist build/my-program-1-0-0 \
+      --signing-key ~/.keys/keygen.key \
+      --account '1fddcec8-8dd3-4d8d-9b16-215cac0f9b52' \
+      --product '2313b7e7-1ea6-4a01-901e-2931de6bb1e2' \
+      --token 'prod-xxx' \
+      --platform 'linux/amd64' \
+      --version '1.0.0'
+
+Docs:
+  https://keygen.sh/docs/cli/`,
+		Args: distArgs,
+		RunE: distRun,
 
 		// Encountering an error should not display usage
 		SilenceUsage: true,

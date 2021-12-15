@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -53,12 +54,12 @@ func init() {
 	distCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID=<id>] (required)")
 	distCmd.Flags().StringVar(&keygenext.Product, "product", "", "your keygen.sh product identifier [$KEYGEN_PRODUCT_ID=<id>] (required)")
 	distCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product token [$KEYGEN_PRODUCT_TOKEN] (required)")
-	distCmd.Flags().StringVar(&distOpts.filename, "filename", "", "filename for the release (default is basename of <path>)")
-	distCmd.Flags().StringVar(&distOpts.filetype, "filetype", "", "filetype for the release (default is extname of <path>)")
+	distCmd.Flags().StringVar(&distOpts.filename, "filename", "", "filename for the release (default grabs basename from <path>)")
+	distCmd.Flags().StringVar(&distOpts.filetype, "filetype", "auto", "filetype for the release (default grabs extname from <path>)")
 	distCmd.Flags().StringVar(&distOpts.version, "version", "", "version for the release (required)")
 	distCmd.Flags().StringVar(&distOpts.name, "name", "", "human-readable name for the release")
 	distCmd.Flags().StringVar(&distOpts.description, "description", "", "description for the release (e.g. release notes)")
-	distCmd.Flags().StringVar(&distOpts.platform, "platform", "", "platform for the release (required)")
+	distCmd.Flags().StringVar(&distOpts.platform, "platform", "", "platform for the release")
 	distCmd.Flags().StringVar(&distOpts.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
 	distCmd.Flags().StringVar(&distOpts.signature, "signature", "", "pre-calculated signature for the release (defaults using ed25519ph)")
 	distCmd.Flags().StringVar(&distOpts.checksum, "checksum", "", "pre-calculated checksum for the release (defaults using sha-512)")
@@ -121,7 +122,6 @@ func init() {
 	}
 
 	distCmd.MarkFlagRequired("version")
-	distCmd.MarkFlagRequired("platform")
 
 	rootCmd.AddCommand(distCmd)
 }
@@ -164,18 +164,22 @@ func distRun(cmd *cobra.Command, args []string) error {
 
 	filename := filepath.Base(info.Name())
 	filesize := info.Size()
-	filetype := filepath.Ext(filename)
-	if filetype == "" {
-		if distOpts.filetype != "" {
-			filetype = distOpts.filetype
-		} else {
-			filetype = "bin"
-		}
-	}
 
 	// Allow filename to be overridden
 	if n := distOpts.filename; n != "" {
 		filename = n
+	}
+
+	// Allow filetype to be overridden
+	var filetype string
+
+	if distOpts.filetype == "auto" {
+		filetype = filepath.Ext(filename)
+		if _, e := strconv.Atoi(filetype); e == nil || filetype == "" {
+			filetype = "bin"
+		}
+	} else {
+		filetype = distOpts.filetype
 	}
 
 	channel := distOpts.channel

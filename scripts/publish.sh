@@ -46,7 +46,6 @@ main() {
     keygen dist "build/install.sh" \
       --filename "cli/install.sh" \
       --name "CLI Installer" \
-      --platform '*' \
       --version "${VERSION}" \
       --no-auto-upgrade
 
@@ -54,7 +53,6 @@ main() {
       --filename "cli/version" \
       --filetype 'txt' \
       --name "CLI Version" \
-      --platform '*' \
       --version "${VERSION}" \
       --no-auto-upgrade
   fi

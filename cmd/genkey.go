@@ -82,7 +82,7 @@ public upgrade key: %s
 		verifyKeyPath,
 	)
 
-	fmt.Fprintf(os.Stderr, yellow("warning:")+" never share your signing key -- "+italic("it's a secret!"))
+	fmt.Fprintf(os.Stderr, yellow("warning:")+" never share your signing key -- "+italic("it's a secret!")+"\n")
 
 	return nil
 }

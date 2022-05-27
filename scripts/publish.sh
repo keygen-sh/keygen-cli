@@ -13,7 +13,7 @@ main() {
   log_info "drafting v${VERSION}"
 
   keygen new \
-    --name "Keygen CLI ${VERSION}" \
+    --name "Keygen CLI v${VERSION}" \
     --channel "${CHANNEL}" \
     --version "${VERSION}"
 

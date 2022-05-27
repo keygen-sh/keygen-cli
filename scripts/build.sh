@@ -17,11 +17,10 @@ main() {
 
   for platform in $PLATFORMS
   do
-    version=$(echo "${VERSION}" | sed 's/[-.+]/_/g')
     read -r os arch \
       <<<$(echo "${platform}" | tr '/' ' ')
 
-    filename="keygen_${os}_${arch}_${version}"
+    filename="keygen_${os}_${arch}"
     if [ "${os}" = 'windows' ]
     then
       filename="${filename}.exe"

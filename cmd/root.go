@@ -32,8 +32,11 @@ type CommandOptions struct {
 	name             string
 	description      string
 	version          string
+	tag              string
 	platform         string
+	arch             string
 	channel          string
+	release          string
 	entitlements     []string
 	signature        string
 	checksum         string

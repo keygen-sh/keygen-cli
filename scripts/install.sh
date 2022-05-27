@@ -94,7 +94,7 @@ get_bin_path() {
 }
 
 get_bin_version() {
-  version=$(curl -sSL 'https://get.keygen.sh/keygen/cli/version')
+  version=$(curl -sSL 'https://get.keygen.sh/keygen/latest/version')
   if [ -z "${version}" ]
   then
     log_err 'unable to get latest version'
@@ -104,15 +104,13 @@ get_bin_version() {
 }
 
 get_bin_url() {
-  version=$(echo "${BIN_VERSION}" | sed 's/[-.+]/_/g')
-
-  filename="keygen_${OS}_${ARCH}_${version}"
+  filename="keygen_${OS}_${ARCH}"
   if [ "${OS}" = 'windows' ]
   then
     filename="${filename}.exe"
   fi
 
-  echo "https://get.keygen.sh/keygen/cli/${filename}"
+  echo "https://get.keygen.sh/keygen/${BIN_VERSION}/${filename}"
 }
 
 assert_os_support() {

@@ -1,26 +1,19 @@
 package keygenext
 
 import (
-	"io"
-
 	"github.com/keygen-sh/jsonapi-go"
-	"github.com/keygen-sh/keygen-go"
+	"github.com/keygen-sh/keygen-go/v2"
 )
 
 type Release struct {
 	ID          string                 `json:"-"`
 	Type        string                 `json:"-"`
-	Name        *string                `json:"name"`
-	Description *string                `json:"description"`
-	Version     string                 `json:"version"`
-	Filename    string                 `json:"filename"`
-	Filetype    string                 `json:"filetype"`
-	Filesize    int64                  `json:"filesize"`
-	Platform    string                 `json:"platform"`
-	Channel     string                 `json:"channel"`
-	Signature   string                 `json:"signature"`
-	Checksum    string                 `json:"checksum"`
-	Metadata    map[string]interface{} `json:"metadata"`
+	Name        *string                `json:"name,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Version     string                 `json:"version,omitempty"`
+	Tag         string                 `json:"tag,omitempty"`
+	Channel     string                 `json:"channel,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	ProductID   string                 `json:"-"`
 	Constraints Constraints            `json:"-"`
 }
@@ -63,15 +56,15 @@ func (r Release) GetRelationships() map[string]interface{} {
 	return relationships
 }
 
-func (r *Release) Upsert() error {
+func (r *Release) Create() error {
 	client := &keygen.Client{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent}
 
-	res, err := client.Put("releases", r, r)
+	res, err := client.Post("releases", r, r)
 	if err != nil {
 		if len(res.Document.Errors) > 0 {
 			e := res.Document.Errors[0]
 
-			return &APIError{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}
+			return &Error{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}
 		}
 
 		return err
@@ -80,26 +73,103 @@ func (r *Release) Upsert() error {
 	return nil
 }
 
-func (r *Release) Upload(reader io.Reader) error {
+func (r *Release) Get() error {
 	client := &keygen.Client{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent}
-	artifact := &Artifact{}
 
-	res, err := client.Put("releases/"+r.ID+"/artifact", nil, artifact)
+	res, err := client.Get("releases/"+r.ID, nil, r)
 	if err != nil {
 		if len(res.Document.Errors) > 0 {
 			e := res.Document.Errors[0]
 
-			return &APIError{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}
+			return &Error{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}
 		}
 
 		return err
 	}
 
-	artifact.ContentLength = r.Filesize
-	artifact.Location = res.Headers.Get("Location")
+	return nil
+}
 
-	err = artifact.Upload(reader)
+func (r *Release) Publish() error {
+	client := &keygen.Client{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent}
+
+	res, err := client.Post("releases/"+r.ID+"/actions/publish", nil, r)
 	if err != nil {
+		if len(res.Document.Errors) > 0 {
+			e := res.Document.Errors[0]
+
+			return &Error{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}
+		}
+
+		return err
+	}
+
+	return nil
+}
+
+func (r *Release) Yank() error {
+	client := &keygen.Client{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent}
+
+	res, err := client.Post("releases/"+r.ID+"/actions/yank", nil, r)
+	if err != nil {
+		if len(res.Document.Errors) > 0 {
+			e := res.Document.Errors[0]
+
+			return &Error{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}
+		}
+
+		return err
+	}
+
+	return nil
+}
+
+func (r *Release) Delete() error {
+	client := &keygen.Client{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent}
+
+	res, err := client.Delete("releases/"+r.ID, nil, r)
+	if err != nil {
+		if len(res.Document.Errors) > 0 {
+			e := res.Document.Errors[0]
+
+			return &Error{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}
+		}
+
+		return err
+	}
+
+	return nil
+}
+
+type TaggedRelease struct {
+	ID   string  `json:"-"`
+	Type string  `json:"-"`
+	Tag  *string `json:"tag"`
+}
+
+func (r TaggedRelease) GetID() string {
+	return r.ID
+}
+
+func (r TaggedRelease) GetType() string {
+	return "releases"
+}
+
+func (r TaggedRelease) GetData() interface{} {
+	return r
+}
+
+func (r *TaggedRelease) Update() error {
+	client := &keygen.Client{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent}
+
+	res, err := client.Patch("releases/"+r.ID, r, r)
+	if err != nil {
+		if len(res.Document.Errors) > 0 {
+			e := res.Document.Errors[0]
+
+			return &Error{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}
+		}
+
 		return err
 	}
 

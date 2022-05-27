@@ -8,7 +8,7 @@ import (
 
 var (
 	// The current version of the CLI, embedded at compile time.
-	Version string
+	Version = "<not set>"
 )
 
 var (

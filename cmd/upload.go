@@ -214,8 +214,7 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 	}
 
 	if err := release.Get(); err != nil {
-		e, ok := err.(*keygenext.Error)
-		if ok {
+		if e, ok := err.(*keygenext.Error); ok {
 			var code string
 			if e.Code != "" {
 				code = italic("(" + e.Code + ")")
@@ -239,8 +238,7 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 	}
 
 	if err := artifact.Create(); err != nil {
-		e, ok := err.(*keygenext.Error)
-		if ok {
+		if e, ok := err.(*keygenext.Error); ok {
 			var code string
 			if e.Code != "" {
 				code = italic("(" + e.Code + ")")

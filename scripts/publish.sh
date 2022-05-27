@@ -10,51 +10,78 @@ log_err() {
 }
 
 main() {
+  log_info "drafting v${VERSION}"
+
+  keygen new \
+    --name "Keygen CLI ${VERSION}" \
+    --channel "${CHANNEL}" \
+    --version "${VERSION}"
+
+  if [ $? -eq 0 ]
+  then
+    log_info "successfully drafted v${VERSION}"
+  else
+    log_err "failed to draft v${VERSION}"
+  fi
+
   for platform in $PLATFORMS
   do
-    version=$(echo "${VERSION}" | sed 's/[-.+]/_/g')
     read -r os arch \
       <<<$(echo "${platform}" | tr '/' ' ')
 
-    filename="keygen_${os}_${arch}_${version}"
+    filename="keygen_${os}_${arch}"
     if [ "${os}" = 'windows' ]
     then
       filename="${filename}.exe"
     fi
 
-    log_info "publishing v${VERSION} for ${platform}: cli/${filename}"
+    log_info "uploading v${VERSION} for ${platform}: ${filename}"
 
-    keygen dist "build/${filename}" \
-      --filename "cli/${filename}" \
-      --name "CLI v${VERSION}" \
-      --platform "${platform}" \
-      --channel "${CHANNEL}" \
-      --version "${VERSION}" \
-      --no-auto-upgrade
+    keygen upload "build/${filename}" \
+      --release "${VERSION}" \
+      --platform "${os}" \
+      --arch "${arch}"
 
     if [ $? -eq 0 ]
     then
-      log_info "successfully published v${VERSION} for ${platform}"
+      log_info "successfully uploading v${VERSION} for ${platform}"
     else
-      log_err "failed to publish v${VERSION} for ${platform}"
+      log_err "failed to upload v${VERSION} for ${platform}"
     fi
   done
 
-  # We only want to update these releases for stable releases
+  # Publish version
+  keygen publish --release "${VERSION}"
+
+  if [ $? -eq 0 ]
+  then
+    log_info "successfully published v${VERSION}"
+  else
+    log_err "failed to publish v${VERSION}"
+  fi
+
+  # We only want to do the rest for stable releases
   if [ "${CHANNEL}" = 'stable' ]
   then
-    keygen dist "build/install.sh" \
-      --filename "cli/install.sh" \
-      --name "CLI Installer" \
-      --version "${VERSION}" \
-      --no-auto-upgrade
+    keygen upload 'build/install.sh' \
+      --release "${VERSION}"
 
-    keygen dist "build/version" \
-      --filename "cli/version" \
-      --filetype 'txt' \
-      --name "CLI Version" \
-      --version "${VERSION}" \
-      --no-auto-upgrade
+    keygen upload 'build/version' \
+      --release "${VERSION}" \
+      --filetype 'txt'
+
+    # Untag latest
+    keygen untag --release 'latest'
+
+    # Tag as latest
+    keygen tag 'latest' --release "${VERSION}"
+
+    if [ $? -eq 0 ]
+    then
+      log_info "successfully tagged v${VERSION}"
+    else
+      log_err "failed to tag v${VERSION}"
+    fi
   fi
 }
 

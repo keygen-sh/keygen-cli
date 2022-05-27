@@ -1,6 +1,6 @@
 package keygenext
 
-type APIError struct {
+type Error struct {
 	Title  string
 	Detail string
 	Code   string
@@ -8,14 +8,14 @@ type APIError struct {
 	Err    error
 }
 
-func (e *APIError) Error() string {
+func (e *Error) Error() string {
 	if e.Code != "" {
-		return e.Code + " - " + e.Title + ": " + e.Detail
+		return "[" + e.Code + "] " + e.Title + ": " + e.Detail
 	} else {
 		return e.Title + ": " + e.Detail
 	}
 }
 
-func (e *APIError) Unwrap() error {
+func (e *Error) Unwrap() error {
 	return e.Err
 }

@@ -28,11 +28,23 @@ var (
 func init() {
 	genkeyCmd.Flags().StringVar(&genkeyOpts.signingKeyPath, "out", "keygen.key", "output the private publishing key to specified file")
 	genkeyCmd.Flags().StringVar(&genkeyOpts.verifyKeyPath, "pubout", "keygen.pub", "output the public upgrade key to specified file")
+	genkeyCmd.Flags().BoolVar(&genkeyOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
+
+	if _, ok := os.LookupEnv("KEYGEN_NO_AUTO_UPGRADE"); ok {
+		genkeyOpts.noAutoUpgrade = true
+	}
 
 	rootCmd.AddCommand(genkeyCmd)
 }
 
 func genkeyRun(cmd *cobra.Command, args []string) error {
+	if !genkeyOpts.noAutoUpgrade {
+		err := upgradeRun(nil, nil)
+		if err != nil {
+			return err
+		}
+	}
+
 	signingKeyPath, err := homedir.Expand(genkeyOpts.signingKeyPath)
 	if err != nil {
 		return fmt.Errorf(`path "%s" is not expandable (%s)`, genkeyOpts.signingKeyPath, err)

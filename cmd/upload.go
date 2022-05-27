@@ -117,7 +117,7 @@ func init() {
 
 func uploadArgs(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
-		return errors.New("artifact path is required")
+		return errors.New("path is required")
 	}
 
 	return nil

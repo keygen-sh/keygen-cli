@@ -132,7 +132,7 @@ Delete an existing release. Sometimes things go really wrong, and this command
 will delete the release and all of its artifacts.
 
 ```sh
-keygen del v1.0.0 \
+keygen del \
   --account '1fddcec8-8dd3-4d8d-9b16-215cac0f9b52' \
   --product '2313b7e7-1ea6-4a01-901e-2931de6bb1e2' \
   --token 'prod-xxx' \

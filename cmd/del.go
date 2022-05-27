@@ -12,7 +12,7 @@ import (
 var (
 	delOpts = &CommandOptions{}
 	delCmd  = &cobra.Command{
-		Use:   "del <version>",
+		Use:   "del",
 		Short: "delete an existing release",
 		Example: `  keygen del \
       --account '1fddcec8-8dd3-4d8d-9b16-215cac0f9b52' \

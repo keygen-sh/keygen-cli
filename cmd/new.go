@@ -15,7 +15,7 @@ var (
 	draftOpts = &CommandOptions{}
 	draftCmd  = &cobra.Command{
 		Use:   "new <version>",
-		Short: "generate an ed25519 key pair for code signing",
+		Short: "create a new draft release",
 		Example: `  keygen new \
       --account '1fddcec8-8dd3-4d8d-9b16-215cac0f9b52' \
       --product '2313b7e7-1ea6-4a01-901e-2931de6bb1e2' \

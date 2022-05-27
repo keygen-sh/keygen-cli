@@ -12,7 +12,7 @@ import (
 var (
 	publishOpts = &CommandOptions{}
 	publishCmd  = &cobra.Command{
-		Use:   "publish <version>",
+		Use:   "publish",
 		Short: "publish an existing release",
 		Example: `  keygen publish \
       --account '1fddcec8-8dd3-4d8d-9b16-215cac0f9b52' \

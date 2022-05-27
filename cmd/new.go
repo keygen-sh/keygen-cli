@@ -14,7 +14,7 @@ import (
 var (
 	draftOpts = &CommandOptions{}
 	draftCmd  = &cobra.Command{
-		Use:   "new <version>",
+		Use:   "new",
 		Short: "create a new draft release",
 		Example: `  keygen new \
       --account '1fddcec8-8dd3-4d8d-9b16-215cac0f9b52' \

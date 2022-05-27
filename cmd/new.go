@@ -21,7 +21,7 @@ var (
       --product '2313b7e7-1ea6-4a01-901e-2931de6bb1e2' \
       --token 'prod-xxx' \
       --channel 'beta' \
-			--version '1.0.0'
+      --version '1.0.0'
 
 Docs:
   https://keygen.sh/docs/cli/`,

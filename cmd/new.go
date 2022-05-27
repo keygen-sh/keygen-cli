@@ -136,7 +136,7 @@ func draftRun(cmd *cobra.Command, args []string) error {
 		if ok {
 			var code string
 			if e.Code != "" {
-				code = italic("[" + e.Code + "]")
+				code = italic("(" + e.Code + ")")
 			}
 
 			return fmt.Errorf("%s: %s %s", e.Title, e.Detail, code)

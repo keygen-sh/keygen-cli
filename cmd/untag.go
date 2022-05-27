@@ -91,8 +91,7 @@ func untagRun(cmd *cobra.Command, args []string) error {
 	}
 
 	if err := release.Update(); err != nil {
-		e, ok := err.(*keygenext.Error)
-		if ok {
+		if e, ok := err.(*keygenext.Error); ok {
 			var code string
 			if e.Code != "" {
 				code = italic("(" + e.Code + ")")

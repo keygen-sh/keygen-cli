@@ -85,7 +85,7 @@ func untagRun(cmd *cobra.Command, args []string) error {
 	}
 
 	italic := color.New(color.Italic).SprintFunc()
-	release := &keygenext.TaggedRelease{
+	release := &keygenext.Release{
 		ID:  untagOpts.release,
 		Tag: nil,
 	}

@@ -99,11 +99,15 @@ func draftRun(cmd *cobra.Command, args []string) error {
 
 	italic := color.New(color.Italic).SprintFunc()
 	channel := draftOpts.channel
-	tag := draftOpts.tag
 
-	constraints := keygenext.Constraints{}
+	var constraints keygenext.Constraints
 	if e := draftOpts.entitlements; len(e) != 0 {
 		constraints = constraints.From(e)
+	}
+
+	var tag *string
+	if t := draftOpts.tag; t != "" {
+		tag = &t
 	}
 
 	var name *string

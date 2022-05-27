@@ -11,7 +11,7 @@ type Release struct {
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
 	Version     string                 `json:"version,omitempty"`
-	Tag         string                 `json:"tag,omitempty"`
+	Tag         *string                `json:"tag,omitempty"`
 	Channel     string                 `json:"channel,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	ProductID   string                 `json:"-"`
@@ -47,10 +47,19 @@ func (r Release) GetData() interface{} {
 func (r Release) GetRelationships() map[string]interface{} {
 	relationships := make(map[string]interface{})
 
-	relationships["constraints"] = r.Constraints
-	relationships["product"] = jsonapi.ResourceObjectIdentifier{
-		Type: "products",
-		ID:   r.ProductID,
+	if len(r.Constraints) > 0 {
+		relationships["constraints"] = r.Constraints
+	}
+
+	if r.ProductID != "" {
+		relationships["product"] = jsonapi.ResourceObjectIdentifier{
+			Type: "products",
+			ID:   r.ProductID,
+		}
+	}
+
+	if len(relationships) == 0 {
+		return nil
 	}
 
 	return relationships
@@ -60,6 +69,23 @@ func (r *Release) Create() error {
 	client := &keygen.Client{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent}
 
 	res, err := client.Post("releases", r, r)
+	if err != nil {
+		if len(res.Document.Errors) > 0 {
+			e := res.Document.Errors[0]
+
+			return &Error{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}
+		}
+
+		return err
+	}
+
+	return nil
+}
+
+func (r *Release) Update() error {
+	client := &keygen.Client{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent}
+
+	res, err := client.Patch("releases/"+r.ID, r, r)
 	if err != nil {
 		if len(res.Document.Errors) > 0 {
 			e := res.Document.Errors[0]
@@ -128,41 +154,6 @@ func (r *Release) Delete() error {
 	client := &keygen.Client{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent}
 
 	res, err := client.Delete("releases/"+r.ID, nil, r)
-	if err != nil {
-		if len(res.Document.Errors) > 0 {
-			e := res.Document.Errors[0]
-
-			return &Error{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}
-		}
-
-		return err
-	}
-
-	return nil
-}
-
-type TaggedRelease struct {
-	ID   string  `json:"-"`
-	Type string  `json:"-"`
-	Tag  *string `json:"tag"`
-}
-
-func (r TaggedRelease) GetID() string {
-	return r.ID
-}
-
-func (r TaggedRelease) GetType() string {
-	return "releases"
-}
-
-func (r TaggedRelease) GetData() interface{} {
-	return r
-}
-
-func (r *TaggedRelease) Update() error {
-	client := &keygen.Client{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent}
-
-	res, err := client.Patch("releases/"+r.ID, r, r)
 	if err != nil {
 		if len(res.Document.Errors) > 0 {
 			e := res.Document.Errors[0]

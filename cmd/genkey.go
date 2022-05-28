@@ -56,11 +56,11 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 	}
 
 	if _, err := os.Stat(signingKeyPath); err == nil {
-		return fmt.Errorf(`signing key file "%s" already exists`, signingKeyPath)
+		return fmt.Errorf(`private key file "%s" already exists`, signingKeyPath)
 	}
 
 	if _, err := os.Stat(verifyKeyPath); err == nil {
-		return fmt.Errorf(`verify key file "%s" already exists`, verifyKeyPath)
+		return fmt.Errorf(`public key file "%s" already exists`, verifyKeyPath)
 	}
 
 	verifyKey, signingKey, err := ed25519.GenerateKey(nil)
@@ -87,14 +87,14 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 	yellow := color.New(color.FgYellow).SprintFunc()
 	italic := color.New(color.Italic).SprintFunc()
 
-	fmt.Printf(`private signing key: %s
-public upgrade key: %s
+	fmt.Printf(`private key: %s
+public key: %s
 `,
 		signingKeyPath,
 		verifyKeyPath,
 	)
 
-	fmt.Fprintf(os.Stderr, yellow("warning:")+" never share your signing key -- "+italic("it's a secret!")+"\n")
+	fmt.Fprintf(os.Stderr, yellow("warning:")+" never share your private key -- "+italic("it's a secret!")+"\n")
 
 	return nil
 }

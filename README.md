@@ -87,7 +87,7 @@ Tag an existing release. This command will set the release's `tag` to the
 provided value. For example, tag a `latest` release.
 
 ```sh
-keygen tag latest \
+keygen tag 'latest' \
   --account '1fddcec8-8dd3-4d8d-9b16-215cac0f9b52' \
   --product '2313b7e7-1ea6-4a01-901e-2931de6bb1e2' \
   --token 'prod-xxx' \

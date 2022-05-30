@@ -50,6 +50,15 @@ main() {
     fi
   done
 
+  # Upload installer
+  keygen upload 'build/install.sh' \
+      --release "${VERSION}"
+
+  # Upload version
+  keygen upload 'build/version' \
+    --release "${VERSION}" \
+    --filetype 'txt'
+
   # Publish version
   keygen publish --release "${VERSION}"
 
@@ -63,13 +72,6 @@ main() {
   # We only want to do the rest for stable releases
   if [ "${CHANNEL}" = 'stable' ]
   then
-    keygen upload 'build/install.sh' \
-      --release "${VERSION}"
-
-    keygen upload 'build/version' \
-      --release "${VERSION}" \
-      --filetype 'txt'
-
     # Untag latest
     keygen untag --release 'latest'
 

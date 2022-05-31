@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	tagOpts = &CommandOptions{}
+	tagOpts = &TagCommandOptions{}
 	tagCmd  = &cobra.Command{
 		Use:   "tag <tag>",
 		Short: "tag an existing release",
@@ -30,6 +30,11 @@ Docs:
 		SilenceUsage: true,
 	}
 )
+
+type TagCommandOptions struct {
+	release       string
+	noAutoUpgrade bool
+}
 
 func init() {
 	tagCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID=<id>] (required)")

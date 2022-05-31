@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	publishOpts = &CommandOptions{}
+	publishOpts = &PublishCommandOptions{}
 	publishCmd  = &cobra.Command{
 		Use:   "publish",
 		Short: "publish an existing release",
@@ -29,6 +29,11 @@ Docs:
 		SilenceUsage: true,
 	}
 )
+
+type PublishCommandOptions struct {
+	release       string
+	noAutoUpgrade bool
+}
 
 func init() {
 	publishCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID=<id>] (required)")

@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	untagOpts = &CommandOptions{}
+	untagOpts = &UntagCommandOptions{}
 	untagCmd  = &cobra.Command{
 		Use:   "untag",
 		Short: "untag an existing release",
@@ -29,6 +29,11 @@ Docs:
 		SilenceUsage: true,
 	}
 )
+
+type UntagCommandOptions struct {
+	release       string
+	noAutoUpgrade bool
+}
 
 func init() {
 	untagCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID=<id>] (required)")

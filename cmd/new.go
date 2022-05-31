@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	draftOpts = &CommandOptions{}
+	draftOpts = &DraftCommandOptions{}
 	draftCmd  = &cobra.Command{
 		Use:   "new",
 		Short: "create a new draft release",
@@ -32,6 +32,16 @@ Docs:
 		SilenceUsage: true,
 	}
 )
+
+type DraftCommandOptions struct {
+	name          string
+	description   string
+	version       string
+	tag           string
+	channel       string
+	entitlements  []string
+	noAutoUpgrade bool
+}
 
 func init() {
 	draftCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID=<id>] (required)")

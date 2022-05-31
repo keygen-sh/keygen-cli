@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	uploadOpts = &CommandOptions{}
+	uploadOpts = &UploadCommandOptions{}
 	uploadCmd  = &cobra.Command{
 		Use:   "upload <path>",
 		Short: "upload a new artifact for a release",
@@ -48,6 +48,20 @@ Docs:
 		SilenceUsage: true,
 	}
 )
+
+type UploadCommandOptions struct {
+	filename         string
+	filetype         string
+	platform         string
+	arch             string
+	release          string
+	signature        string
+	checksum         string
+	signingAlgorithm string
+	signingKeyPath   string
+	signingKey       string
+	noAutoUpgrade    bool
+}
 
 func init() {
 	uploadCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID=<id>] (required)")

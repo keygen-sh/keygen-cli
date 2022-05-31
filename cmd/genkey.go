@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	genkeyOpts = &CommandOptions{}
+	genkeyOpts = &GenKeyCommandOptions{}
 	genkeyCmd  = &cobra.Command{
 		Use:   "genkey",
 		Short: "generate an ed25519 key pair for code signing",
@@ -24,6 +24,12 @@ var (
 		SilenceUsage: true,
 	}
 )
+
+type GenKeyCommandOptions struct {
+	signingKeyPath string
+	verifyKeyPath  string
+	noAutoUpgrade  bool
+}
 
 func init() {
 	genkeyCmd.Flags().StringVar(&genkeyOpts.signingKeyPath, "out", "keygen.key", "output the private publishing key to specified file")

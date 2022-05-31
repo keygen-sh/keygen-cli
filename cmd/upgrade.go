@@ -24,7 +24,8 @@ var (
 )
 
 var (
-	upgradeCmd = &cobra.Command{
+	upgradeOpts = &UpgradeCommandOptions{}
+	upgradeCmd  = &cobra.Command{
 		Use:   "upgrade",
 		Short: "check if a CLI upgrade is available",
 		Args:  cobra.NoArgs,
@@ -34,6 +35,10 @@ var (
 		Hidden:       true,
 	}
 )
+
+type UpgradeCommandOptions struct {
+	channel string
+}
 
 func init() {
 	keygen.PublicKey = "b8f3eb4cd260135f67a5096e8dc1c9b9dcb81ee9fe50d12cdcd941f6607a9031"

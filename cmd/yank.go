@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	yankOpts = &CommandOptions{}
+	yankOpts = &YankCommandOptions{}
 	yankCmd  = &cobra.Command{
 		Use:   "yank",
 		Short: "yank an existing release",
@@ -29,6 +29,11 @@ Docs:
 		SilenceUsage: true,
 	}
 )
+
+type YankCommandOptions struct {
+	release       string
+	noAutoUpgrade bool
+}
 
 func init() {
 	yankCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID=<id>] (required)")

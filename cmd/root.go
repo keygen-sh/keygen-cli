@@ -26,27 +26,6 @@ Version:
 	}
 )
 
-type CommandOptions struct {
-	filename         string
-	filetype         string
-	name             string
-	description      string
-	version          string
-	tag              string
-	platform         string
-	arch             string
-	channel          string
-	release          string
-	entitlements     []string
-	signature        string
-	checksum         string
-	signingAlgorithm string
-	signingKeyPath   string
-	verifyKeyPath    string
-	signingKey       string
-	noAutoUpgrade    bool
-}
-
 func init() {
 	keygenext.UserAgent = "cli/" + Version
 

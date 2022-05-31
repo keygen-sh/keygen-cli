@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	delOpts = &CommandOptions{}
+	delOpts = &DeleteCommandOptions{}
 	delCmd  = &cobra.Command{
 		Use:   "del",
 		Short: "delete an existing release",
@@ -29,6 +29,11 @@ Docs:
 		SilenceUsage: true,
 	}
 )
+
+type DeleteCommandOptions struct {
+	release       string
+	noAutoUpgrade bool
+}
 
 func init() {
 	delCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID=<id>] (required)")

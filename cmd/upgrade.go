@@ -41,6 +41,8 @@ type UpgradeCommandOptions struct {
 }
 
 func init() {
+	upgradeCmd.Flags().StringVar(&upgradeOpts.channel, "channel", "<auto>", "channel for upgrade check, one of: stable, rc, beta, alpha, dev")
+
 	keygen.PublicKey = "b8f3eb4cd260135f67a5096e8dc1c9b9dcb81ee9fe50d12cdcd941f6607a9031"
 	keygen.Account = "5cc3b5a2-0d08-4291-940b-41c21f0ba6ab"
 	keygen.Product = "0d5f0b57-3102-4ddf-beb9-f652cf8e24b7"
@@ -74,17 +76,21 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 
 	// Adjust upgrade channel based on current version
 	var channel string
-	switch {
-	case strings.Contains(Version, "-rc"):
-		channel = "rc"
-	case strings.Contains(Version, "-beta"):
-		channel = "beta"
-	case strings.Contains(Version, "-alpha"):
-		channel = "alpha"
-	case strings.Contains(Version, "-dev"):
-		channel = "dev"
-	default:
-		channel = "stable"
+	if upgradeOpts.channel == "<auto>" {
+		switch {
+		case strings.Contains(Version, "-rc"):
+			channel = "rc"
+		case strings.Contains(Version, "-beta"):
+			channel = "beta"
+		case strings.Contains(Version, "-alpha"):
+			channel = "alpha"
+		case strings.Contains(Version, "-dev"):
+			channel = "dev"
+		default:
+			channel = "stable"
+		}
+	} else {
+		channel = upgradeOpts.channel
 	}
 
 	release, err := keygen.Upgrade(

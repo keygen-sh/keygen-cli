@@ -11,7 +11,7 @@ type Release struct {
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
 	Version     string                 `json:"version,omitempty"`
-	Tag         *string                `json:"tag,omitempty"`
+	Tag         *string                `json:"tag"`
 	Channel     string                 `json:"channel,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	ProductID   string                 `json:"-"`

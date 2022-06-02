@@ -54,13 +54,13 @@ be generated for the release. In addition, When the `--signing-key` flag is prov
 the release will be signed using Ed25519ph.
 
 ```sh
-keygen upload ./build/keygen_darwin_arm64 \
+keygen upload ./build/keygen_darwin_amd64 \
   --signing-key ~/.keys/keygen.key \
   --account '1fddcec8-8dd3-4d8d-9b16-215cac0f9b52' \
   --product '2313b7e7-1ea6-4a01-901e-2931de6bb1e2' \
   --token 'prod-xxx' \
   --release '1.0.0' \
-  --platform 'linux' \
+  --platform 'darwin' \
   --arch 'amd64'
 ```
 

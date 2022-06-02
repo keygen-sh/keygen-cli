@@ -15,7 +15,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/fatih/color"
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
 	"github.com/mattn/go-isatty"
 	"github.com/mitchellh/go-homedir"
@@ -145,7 +144,6 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	italic := color.New(color.Italic).SprintFunc()
 	path, err := homedir.Expand(args[0])
 	if err != nil {
 		return fmt.Errorf(`path "%s" is not expandable (%s)`, args[0], italic(err))
@@ -301,7 +299,7 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 		progress.Wait()
 	}
 
-	fmt.Println("uploaded artifact " + italic(artifact.ID))
+	fmt.Println(green("uploaded:") + " artifact " + italic(artifact.ID))
 
 	return nil
 }
@@ -352,7 +350,7 @@ func calculateSignature(encSigningKey string, file *os.File) (string, error) {
 			return "", err
 		}
 	case "ed25519":
-		fmt.Println("warning: using ed25519 to sign large files is not recommended (use ed25519ph instead)")
+		fmt.Println(yellow("warning:") + " using ed25519 to sign large files is not recommended (use ed25519ph instead)")
 
 		b, err := ioutil.ReadAll(file)
 		if err != nil {

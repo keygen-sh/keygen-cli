@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fatih/color"
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
 	"github.com/spf13/cobra"
 )
@@ -89,7 +88,6 @@ func untagRun(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	italic := color.New(color.Italic).SprintFunc()
 	release := &keygenext.Release{
 		ID:  untagOpts.release,
 		Tag: nil,
@@ -108,7 +106,7 @@ func untagRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println("untagged release " + italic(release.ID))
+	fmt.Println(green("untagged:") + " release " + italic(release.ID))
 
 	return nil
 }

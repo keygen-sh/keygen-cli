@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fatih/color"
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
 	"github.com/spf13/cobra"
 )
@@ -89,7 +88,6 @@ func publishRun(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	italic := color.New(color.Italic).SprintFunc()
 	release := &keygenext.Release{
 		ID: publishOpts.release,
 	}
@@ -107,7 +105,7 @@ func publishRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println("published release " + italic(release.ID))
+	fmt.Println(green("published:") + " release " + italic(release.ID))
 
 	return nil
 }

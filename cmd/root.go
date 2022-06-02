@@ -39,8 +39,6 @@ func init() {
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		red := color.New(color.FgRed).SprintFunc()
-
 		fmt.Fprintln(os.Stderr, red("error:")+" "+err.Error())
 
 		os.Exit(1)

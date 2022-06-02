@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fatih/color"
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
 	"github.com/spf13/cobra"
 )
@@ -89,7 +88,6 @@ func delRun(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	italic := color.New(color.Italic).SprintFunc()
 	release := &keygenext.Release{
 		ID: delOpts.release,
 	}
@@ -107,7 +105,7 @@ func delRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println("deleted release " + italic(release.ID))
+	fmt.Println(green("deleted:") + " release " + italic(release.ID))
 
 	return nil
 }

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fatih/color"
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
 	"github.com/spf13/cobra"
 )
@@ -98,7 +97,6 @@ func tagRun(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	italic := color.New(color.Italic).SprintFunc()
 	release := &keygenext.Release{
 		ID:  tagOpts.release,
 		Tag: &args[0],
@@ -117,7 +115,7 @@ func tagRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println("tagged release " + italic(release.ID))
+	fmt.Println(green("tagged:") + " release " + italic(release.ID))
 
 	return nil
 }

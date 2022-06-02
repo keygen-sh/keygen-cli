@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/eiannone/keyboard"
-	"github.com/fatih/color"
 	"github.com/keygen-sh/keygen-go/v2"
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
@@ -111,8 +110,6 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	italic := color.New(color.Italic).SprintFunc()
-
 	fmt.Printf("an upgrade is available! would you like to install " + italic("v"+release.Version) + " now? Y/n ")
 
 	key, _, err := keyboard.GetSingleKey()
@@ -124,8 +121,6 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 
 	if k := KeyCode(key); k != KeyCodeEnter && k != KeyCodeY {
 		if cmd != nil {
-			yellow := color.New(color.FgYellow).SprintFunc()
-
 			fmt.Println(yellow("warning:") + " upgrade aborted")
 		}
 
@@ -153,7 +148,7 @@ func upgradeRun(cmd *cobra.Command, args []string) error {
 	progress.Wait()
 
 	if cmd != nil {
-		fmt.Println("install complete! now on " + italic("v"+release.Version))
+		fmt.Println(green("upgraded:") + " now on " + italic("v"+release.Version))
 	}
 
 	return nil

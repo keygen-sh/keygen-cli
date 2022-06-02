@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/fatih/color"
 	"github.com/mitchellh/go-homedir"
 	"github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
 	"github.com/spf13/cobra"
@@ -89,9 +88,6 @@ func genkeyRun(cmd *cobra.Command, args []string) error {
 	if abs, err := filepath.Abs(verifyKeyPath); err == nil {
 		verifyKeyPath = abs
 	}
-
-	yellow := color.New(color.FgYellow).SprintFunc()
-	italic := color.New(color.Italic).SprintFunc()
 
 	fmt.Printf(`private key: %s
 public key: %s

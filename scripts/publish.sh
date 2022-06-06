@@ -51,8 +51,7 @@ main() {
   done
 
   # Upload installer
-  keygen upload 'build/install.sh' \
-      --release "${VERSION}"
+  keygen upload 'build/install.sh' --release "${VERSION}"
 
   # Upload version
   keygen upload 'build/version' \

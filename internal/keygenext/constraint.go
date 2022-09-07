@@ -1,6 +1,10 @@
 package keygenext
 
-import "github.com/keygen-sh/jsonapi-go"
+import (
+	"github.com/google/uuid"
+	"github.com/keygen-sh/jsonapi-go"
+	"github.com/keygen-sh/keygen-go/v2"
+)
 
 type Constraint struct {
 	ID            string `json:"-"`
@@ -42,8 +46,18 @@ func (c Constraints) GetData() interface{} {
 }
 
 func (c Constraints) From(entitlements []string) Constraints {
-	for _, entitlement := range entitlements {
-		c = append(c, Constraint{EntitlementID: entitlement})
+	for _, identifier := range entitlements {
+		if _, err := uuid.Parse(identifier); err != nil {
+			entitlement := &Entitlement{keygen.Entitlement{ID: identifier}}
+
+			// identifier may be an ID or an entitlement code, so we're
+			// retrieving the entitlement to get it's real ID.
+			entitlement.Get()
+
+			identifier = entitlement.ID
+		}
+
+		c = append(c, Constraint{EntitlementID: identifier})
 	}
 
 	return c

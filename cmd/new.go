@@ -52,8 +52,6 @@ func init() {
 	draftCmd.Flags().StringVar(&draftOpts.description, "description", "", "description for the release (e.g. release notes)")
 	draftCmd.Flags().StringVar(&draftOpts.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
 	draftCmd.Flags().BoolVar(&draftOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
-
-	// TODO(ezekg) Accept entitlement codes and entitlement IDs?
 	draftCmd.Flags().StringSliceVar(&draftOpts.entitlements, "entitlements", []string{}, "comma seperated list of entitlement constraints (e.g. --entitlements <id>,<id>,...)")
 
 	// TODO(ezekg) Prompt multi-line description input from stdin if "--"?

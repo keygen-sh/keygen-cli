@@ -3,6 +3,7 @@ package keygenext
 import (
 	"errors"
 	"io"
+	"mime"
 	"net/http"
 
 	"github.com/keygen-sh/jsonapi-go"
@@ -90,6 +91,14 @@ func (a *Artifact) Upload(reader io.Reader) error {
 	if err != nil {
 		return err
 	}
+
+	// Detect the content type, otherwise everything is application/octet-stream.
+	mimetype := mime.TypeByExtension("." + a.Filetype)
+	if mimetype == "" {
+		mimetype = "application/octet-stream"
+	}
+
+	req.Header.Set("Content-Type", mimetype)
 
 	// This must be set otherwise the Go http package sends a Transfer-Encoding
 	// header, which S3 does not support.

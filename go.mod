@@ -8,7 +8,7 @@ require (
 	github.com/fatih/color v1.7.0
 	github.com/google/uuid v1.3.0
 	github.com/keygen-sh/jsonapi-go v1.2.0
-	github.com/keygen-sh/keygen-go/v2 v2.2.1
+	github.com/keygen-sh/keygen-go/v2 v2.3.1
 	github.com/mattn/go-isatty v0.0.14
 	github.com/mitchellh/go-homedir v1.0.0
 	github.com/oasisprotocol/curve25519-voi v0.0.0-20220328075252-7dd334e3daae

@@ -37,7 +37,8 @@ type DeleteCommandOptions struct {
 func init() {
 	delCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID=<id>] (required)")
 	delCmd.Flags().StringVar(&keygenext.Product, "product", "", "your keygen.sh product identifier [$KEYGEN_PRODUCT_ID=<id>] (required)")
-	delCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product token [$KEYGEN_PRODUCT_TOKEN] (required)")
+	delCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh environment or product token [$KEYGEN_TOKEN] (required)")
+	delCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	delCmd.Flags().StringVar(&delOpts.release, "release", "", "the release identifier (required)")
 	delCmd.Flags().BoolVar(&delOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
@@ -53,7 +54,19 @@ func init() {
 		}
 	}
 
+	if v, ok := os.LookupEnv("KEYGEN_ENVIRONMENT_TOKEN"); ok {
+		if keygenext.Token == "" {
+			keygenext.Token = v
+		}
+	}
+
 	if v, ok := os.LookupEnv("KEYGEN_PRODUCT_TOKEN"); ok {
+		if keygenext.Token == "" {
+			keygenext.Token = v
+		}
+	}
+
+	if v, ok := os.LookupEnv("KEYGEN_TOKEN"); ok {
 		if keygenext.Token == "" {
 			keygenext.Token = v
 		}

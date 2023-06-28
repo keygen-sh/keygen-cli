@@ -37,7 +37,8 @@ type PublishCommandOptions struct {
 func init() {
 	publishCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID=<id>] (required)")
 	publishCmd.Flags().StringVar(&keygenext.Product, "product", "", "your keygen.sh product identifier [$KEYGEN_PRODUCT_ID=<id>] (required)")
-	publishCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product token [$KEYGEN_PRODUCT_TOKEN] (required)")
+	publishCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product or environment token [$KEYGEN_TOKEN] (required)")
+	publishCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	publishCmd.Flags().StringVar(&publishOpts.release, "release", "", "the release identifier (required)")
 	publishCmd.Flags().BoolVar(&publishOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
@@ -53,7 +54,19 @@ func init() {
 		}
 	}
 
+	if v, ok := os.LookupEnv("KEYGEN_ENVIRONMENT_TOKEN"); ok {
+		if keygenext.Token == "" {
+			keygenext.Token = v
+		}
+	}
+
 	if v, ok := os.LookupEnv("KEYGEN_PRODUCT_TOKEN"); ok {
+		if keygenext.Token == "" {
+			keygenext.Token = v
+		}
+	}
+
+	if v, ok := os.LookupEnv("KEYGEN_TOKEN"); ok {
 		if keygenext.Token == "" {
 			keygenext.Token = v
 		}

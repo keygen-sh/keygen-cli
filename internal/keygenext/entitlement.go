@@ -10,7 +10,7 @@ type Entitlement struct {
 
 func (e *Entitlement) Get() error {
 	client := keygen.NewClientWithOptions(
-		&keygen.ClientOptions{Account: Account, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent},
+		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent},
 	)
 
 	res, err := client.Get("entitlements/"+e.ID, nil, e)

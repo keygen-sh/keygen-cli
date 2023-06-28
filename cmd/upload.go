@@ -65,7 +65,8 @@ type UploadCommandOptions struct {
 func init() {
 	uploadCmd.Flags().StringVar(&keygenext.Account, "account", "", "your keygen.sh account identifier [$KEYGEN_ACCOUNT_ID=<id>] (required)")
 	uploadCmd.Flags().StringVar(&keygenext.Product, "product", "", "your keygen.sh product identifier [$KEYGEN_PRODUCT_ID=<id>] (required)")
-	uploadCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product token [$KEYGEN_PRODUCT_TOKEN] (required)")
+	uploadCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product or environment token [$KEYGEN_TOKEN] (required)")
+	uploadCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	uploadCmd.Flags().StringVar(&uploadOpts.release, "release", "", "the release identifier (required)")
 	uploadCmd.Flags().StringVar(&uploadOpts.filename, "filename", "", "filename for the artifact (defaults to basename of <path>)")
 	uploadCmd.Flags().StringVar(&uploadOpts.filetype, "filetype", "<auto>", "filetype for the artifact (defaults to extname of <path>)")
@@ -89,7 +90,19 @@ func init() {
 		}
 	}
 
+	if v, ok := os.LookupEnv("KEYGEN_ENVIRONMENT_TOKEN"); ok {
+		if keygenext.Token == "" {
+			keygenext.Token = v
+		}
+	}
+
 	if v, ok := os.LookupEnv("KEYGEN_PRODUCT_TOKEN"); ok {
+		if keygenext.Token == "" {
+			keygenext.Token = v
+		}
+	}
+
+	if v, ok := os.LookupEnv("KEYGEN_TOKEN"); ok {
 		if keygenext.Token == "" {
 			keygenext.Token = v
 		}

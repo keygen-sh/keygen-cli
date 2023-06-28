@@ -4,9 +4,10 @@
 package keygenext
 
 var (
-	Account   string
-	Product   string
-	Token     string
-	PublicKey string
-	UserAgent string
+	Account     string
+	Environment string
+	Product     string
+	Token       string
+	PublicKey   string
+	UserAgent   string
 )

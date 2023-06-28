@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 log_info() {
   echo "[info] $1"
@@ -86,7 +86,7 @@ main() {
   fi
 }
 
-PLATFORMS=$(go tool dist list | grep -vE 'ios|android|js|aix|illumos|riscv64|plan9|solaris')
+PLATFORMS=$(go tool dist list | grep -vE 'ios|android|js|aix|illumos|riscv64|plan9|solaris|loong')
 VERSION=$(cat VERSION)
 CHANNEL='stable'
 

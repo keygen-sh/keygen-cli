@@ -67,7 +67,7 @@ func (r Release) GetRelationships() map[string]interface{} {
 
 func (r *Release) Create() error {
 	client := keygen.NewClientWithOptions(
-		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent},
+		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent, APIURL: APIURL},
 	)
 
 	res, err := client.Post("releases", r, r)
@@ -86,7 +86,7 @@ func (r *Release) Create() error {
 
 func (r *Release) Update() error {
 	client := keygen.NewClientWithOptions(
-		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent},
+		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent, APIURL: APIURL},
 	)
 
 	res, err := client.Patch("releases/"+r.ID, r, r)
@@ -105,7 +105,7 @@ func (r *Release) Update() error {
 
 func (r *Release) Get() error {
 	client := keygen.NewClientWithOptions(
-		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent},
+		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent, APIURL: APIURL},
 	)
 
 	res, err := client.Get("releases/"+r.ID, nil, r)
@@ -124,7 +124,7 @@ func (r *Release) Get() error {
 
 func (r *Release) Publish() error {
 	client := keygen.NewClientWithOptions(
-		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent},
+		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent, APIURL: APIURL},
 	)
 
 	res, err := client.Post("releases/"+r.ID+"/actions/publish", nil, r)
@@ -143,7 +143,7 @@ func (r *Release) Publish() error {
 
 func (r *Release) Yank() error {
 	client := keygen.NewClientWithOptions(
-		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent},
+		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent, APIURL: APIURL},
 	)
 
 	res, err := client.Post("releases/"+r.ID+"/actions/yank", nil, r)
@@ -162,7 +162,7 @@ func (r *Release) Yank() error {
 
 func (r *Release) Delete() error {
 	client := keygen.NewClientWithOptions(
-		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent},
+		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent, APIURL: APIURL},
 	)
 
 	res, err := client.Delete("releases/"+r.ID, nil, r)

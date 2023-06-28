@@ -39,6 +39,7 @@ func init() {
 	untagCmd.Flags().StringVar(&keygenext.Product, "product", "", "your keygen.sh product identifier [$KEYGEN_PRODUCT_ID=<id>] (required)")
 	untagCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product or environment token [$KEYGEN_TOKEN] (required)")
 	untagCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
+	untagCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
 	untagCmd.Flags().StringVar(&untagOpts.release, "release", "", "the release identifier (required)")
 	untagCmd.Flags().BoolVar(&untagOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
@@ -69,6 +70,12 @@ func init() {
 	if v, ok := os.LookupEnv("KEYGEN_TOKEN"); ok {
 		if keygenext.Token == "" {
 			keygenext.Token = v
+		}
+	}
+
+	if v, ok := os.LookupEnv("KEYGEN_HOST"); ok {
+		if keygenext.APIURL == "" {
+			keygenext.APIURL = v
 		}
 	}
 

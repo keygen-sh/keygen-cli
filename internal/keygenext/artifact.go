@@ -65,7 +65,7 @@ func (a Artifact) GetRelationships() map[string]interface{} {
 
 func (a *Artifact) Create() error {
 	client := keygen.NewClientWithOptions(
-		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent},
+		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent, APIURL: APIURL},
 	)
 
 	res, err := client.Post("artifacts", a, a)

@@ -10,4 +10,5 @@ var (
 	Token       string
 	PublicKey   string
 	UserAgent   string
+	APIURL      string
 )

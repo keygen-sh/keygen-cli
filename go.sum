@@ -193,6 +193,10 @@ github.com/keygen-sh/jsonapi-go v1.2.0 h1:BXVX9YAZt4itgTs9sV0ame0/+6WQMZHhbF8f62
 github.com/keygen-sh/jsonapi-go v1.2.0/go.mod h1:8j9vsLiKyJyDqmt8r3tYaYNmXszq2+cFhoO6QdMdAes=
 github.com/keygen-sh/keygen-go/v2 v2.4.0 h1:p6i5ZyV6c6jVKfr3ybq4KF+zhomV6gyOhgLNMMa8iwU=
 github.com/keygen-sh/keygen-go/v2 v2.4.0/go.mod h1:npC1vHkQzB/PmsHWQmzHQvcPMTUnRQD3F9W4iDdif38=
+github.com/keygen-sh/keygen-go/v2 v2.4.2-0.20230628145504-034c68d99520 h1:moEbeiGE7NUVO1n1jbY2/dtRJ66CRYD2KK2gsRGob4c=
+github.com/keygen-sh/keygen-go/v2 v2.4.2-0.20230628145504-034c68d99520/go.mod h1:npC1vHkQzB/PmsHWQmzHQvcPMTUnRQD3F9W4iDdif38=
+github.com/keygen-sh/keygen-go/v2 v2.4.2-0.20230628155536-d11fc013d213 h1:3laIK7PdBblGBo4Bc/l7+X1UA8M4exGn70J6NLgDGwo=
+github.com/keygen-sh/keygen-go/v2 v2.4.2-0.20230628155536-d11fc013d213/go.mod h1:npC1vHkQzB/PmsHWQmzHQvcPMTUnRQD3F9W4iDdif38=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/kr/fs v0.1.0/go.mod h1:FFnZGqtBN9Gxj7eW1uZ42v5BccTP0vu6NEaFoC2HwRg=

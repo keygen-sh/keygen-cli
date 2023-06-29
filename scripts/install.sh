@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 log_info() {
   echo "[info] ${1}"

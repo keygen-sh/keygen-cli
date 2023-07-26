@@ -15,7 +15,7 @@ func (e *Entitlement) Get() error {
 
 	res, err := client.Get("entitlements/"+e.ID, nil, e)
 	if err != nil {
-		if len(res.Document.Errors) > 0 {
+		if res != nil && len(res.Document.Errors) > 0 {
 			e := res.Document.Errors[0]
 
 			return &Error{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}

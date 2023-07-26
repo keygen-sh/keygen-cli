@@ -31,8 +31,8 @@ Docs:
 )
 
 type TagCommandOptions struct {
-	release       string
-	noAutoUpgrade bool
+	Release       string
+	NoAutoUpgrade bool
 }
 
 func init() {
@@ -41,8 +41,8 @@ func init() {
 	tagCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product or environment token [$KEYGEN_TOKEN] (required)")
 	tagCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	tagCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
-	tagCmd.Flags().StringVar(&tagOpts.release, "release", "", "the release identifier (required)")
-	tagCmd.Flags().BoolVar(&tagOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
+	tagCmd.Flags().StringVar(&tagOpts.Release, "release", "", "the release identifier (required)")
+	tagCmd.Flags().BoolVar(&tagOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
 		if keygenext.Account == "" {
@@ -81,7 +81,7 @@ func init() {
 	}
 
 	if _, ok := os.LookupEnv("KEYGEN_NO_AUTO_UPGRADE"); ok {
-		tagOpts.noAutoUpgrade = true
+		tagOpts.NoAutoUpgrade = true
 	}
 
 	if keygenext.Account == "" {
@@ -110,7 +110,7 @@ func tagArgs(cmd *cobra.Command, args []string) error {
 }
 
 func tagRun(cmd *cobra.Command, args []string) error {
-	if !tagOpts.noAutoUpgrade {
+	if !tagOpts.NoAutoUpgrade {
 		err := upgradeRun(nil, nil)
 		if err != nil {
 			return err
@@ -118,7 +118,7 @@ func tagRun(cmd *cobra.Command, args []string) error {
 	}
 
 	release := &keygenext.Release{
-		ID:  tagOpts.release,
+		ID:  tagOpts.Release,
 		Tag: &args[0],
 	}
 

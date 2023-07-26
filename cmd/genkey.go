@@ -25,39 +25,39 @@ var (
 )
 
 type GenKeyCommandOptions struct {
-	signingKeyPath string
-	verifyKeyPath  string
-	noAutoUpgrade  bool
+	SigningKeyPath string
+	VerifyKeyPath  string
+	NoAutoUpgrade  bool
 }
 
 func init() {
-	genkeyCmd.Flags().StringVar(&genkeyOpts.signingKeyPath, "out", "keygen.key", "output the private publishing key to specified file")
-	genkeyCmd.Flags().StringVar(&genkeyOpts.verifyKeyPath, "pubout", "keygen.pub", "output the public upgrade key to specified file")
-	genkeyCmd.Flags().BoolVar(&genkeyOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
+	genkeyCmd.Flags().StringVar(&genkeyOpts.SigningKeyPath, "out", "keygen.key", "output the private publishing key to specified file")
+	genkeyCmd.Flags().StringVar(&genkeyOpts.VerifyKeyPath, "pubout", "keygen.pub", "output the public upgrade key to specified file")
+	genkeyCmd.Flags().BoolVar(&genkeyOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if _, ok := os.LookupEnv("KEYGEN_NO_AUTO_UPGRADE"); ok {
-		genkeyOpts.noAutoUpgrade = true
+		genkeyOpts.NoAutoUpgrade = true
 	}
 
 	rootCmd.AddCommand(genkeyCmd)
 }
 
 func genkeyRun(cmd *cobra.Command, args []string) error {
-	if !genkeyOpts.noAutoUpgrade {
+	if !genkeyOpts.NoAutoUpgrade {
 		err := upgradeRun(nil, nil)
 		if err != nil {
 			return err
 		}
 	}
 
-	signingKeyPath, err := homedir.Expand(genkeyOpts.signingKeyPath)
+	signingKeyPath, err := homedir.Expand(genkeyOpts.SigningKeyPath)
 	if err != nil {
-		return fmt.Errorf(`path "%s" is not expandable (%s)`, genkeyOpts.signingKeyPath, err)
+		return fmt.Errorf(`path "%s" is not expandable (%s)`, genkeyOpts.SigningKeyPath, err)
 	}
 
-	verifyKeyPath, err := homedir.Expand(genkeyOpts.verifyKeyPath)
+	verifyKeyPath, err := homedir.Expand(genkeyOpts.VerifyKeyPath)
 	if err != nil {
-		return fmt.Errorf(`path "%s" is not expandable (%s)`, genkeyOpts.verifyKeyPath, err)
+		return fmt.Errorf(`path "%s" is not expandable (%s)`, genkeyOpts.VerifyKeyPath, err)
 	}
 
 	if _, err := os.Stat(signingKeyPath); err == nil {

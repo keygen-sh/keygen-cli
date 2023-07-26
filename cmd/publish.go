@@ -30,8 +30,8 @@ Docs:
 )
 
 type PublishCommandOptions struct {
-	release       string
-	noAutoUpgrade bool
+	Release       string
+	NoAutoUpgrade bool
 }
 
 func init() {
@@ -40,8 +40,8 @@ func init() {
 	publishCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product or environment token [$KEYGEN_TOKEN] (required)")
 	publishCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	publishCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
-	publishCmd.Flags().StringVar(&publishOpts.release, "release", "", "the release identifier (required)")
-	publishCmd.Flags().BoolVar(&publishOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
+	publishCmd.Flags().StringVar(&publishOpts.Release, "release", "", "the release identifier (required)")
+	publishCmd.Flags().BoolVar(&publishOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
 		if keygenext.Account == "" {
@@ -80,7 +80,7 @@ func init() {
 	}
 
 	if _, ok := os.LookupEnv("KEYGEN_NO_AUTO_UPGRADE"); ok {
-		publishOpts.noAutoUpgrade = true
+		publishOpts.NoAutoUpgrade = true
 	}
 
 	if keygenext.Account == "" {
@@ -101,7 +101,7 @@ func init() {
 }
 
 func publishRun(cmd *cobra.Command, args []string) error {
-	if !publishOpts.noAutoUpgrade {
+	if !publishOpts.NoAutoUpgrade {
 		err := upgradeRun(nil, nil)
 		if err != nil {
 			return err
@@ -109,7 +109,7 @@ func publishRun(cmd *cobra.Command, args []string) error {
 	}
 
 	release := &keygenext.Release{
-		ID: publishOpts.release,
+		ID: publishOpts.Release,
 	}
 
 	if err := release.Publish(); err != nil {

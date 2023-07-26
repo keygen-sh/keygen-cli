@@ -49,17 +49,17 @@ Docs:
 )
 
 type UploadCommandOptions struct {
-	filename         string
-	filetype         string
-	platform         string
-	arch             string
-	release          string
-	signature        string
-	checksum         string
-	signingAlgorithm string
-	signingKeyPath   string
-	signingKey       string
-	noAutoUpgrade    bool
+	Filename         string
+	Filetype         string
+	Platform         string
+	Arch             string
+	Release          string
+	Signature        string
+	Checksum         string
+	SigningAlgorithm string
+	SigningKeyPath   string
+	SigningKey       string
+	NoAutoUpgrade    bool
 }
 
 func init() {
@@ -68,16 +68,16 @@ func init() {
 	uploadCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product or environment token [$KEYGEN_TOKEN] (required)")
 	uploadCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	uploadCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
-	uploadCmd.Flags().StringVar(&uploadOpts.release, "release", "", "the release identifier (required)")
-	uploadCmd.Flags().StringVar(&uploadOpts.filename, "filename", "", "filename for the artifact (defaults to basename of <path>)")
-	uploadCmd.Flags().StringVar(&uploadOpts.filetype, "filetype", "<auto>", "filetype for the artifact (defaults to extname of <path>)")
-	uploadCmd.Flags().StringVar(&uploadOpts.platform, "platform", "", "platform for the artifact")
-	uploadCmd.Flags().StringVar(&uploadOpts.arch, "arch", "", "arch for the artifact")
-	uploadCmd.Flags().StringVar(&uploadOpts.signature, "signature", "", "pre-calculated signature for the artifact (defaults using ed25519ph)")
-	uploadCmd.Flags().StringVar(&uploadOpts.checksum, "checksum", "", "pre-calculated checksum for the artifact (defaults using sha-512)")
-	uploadCmd.Flags().StringVar(&uploadOpts.signingAlgorithm, "signing-algorithm", "ed25519ph", "the signing algorithm to use, one of: ed25519ph, ed25519")
-	uploadCmd.Flags().StringVar(&uploadOpts.signingKeyPath, "signing-key", "", "path to ed25519 private key for signing the artifact [$KEYGEN_SIGNING_KEY_PATH=<path>, $KEYGEN_SIGNING_KEY=<key>]")
-	uploadCmd.Flags().BoolVar(&uploadOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
+	uploadCmd.Flags().StringVar(&uploadOpts.Release, "release", "", "the release identifier (required)")
+	uploadCmd.Flags().StringVar(&uploadOpts.Filename, "filename", "", "filename for the artifact (defaults to basename of <path>)")
+	uploadCmd.Flags().StringVar(&uploadOpts.Filetype, "filetype", "<auto>", "filetype for the artifact (defaults to extname of <path>)")
+	uploadCmd.Flags().StringVar(&uploadOpts.Platform, "platform", "", "platform for the artifact")
+	uploadCmd.Flags().StringVar(&uploadOpts.Arch, "arch", "", "arch for the artifact")
+	uploadCmd.Flags().StringVar(&uploadOpts.Signature, "signature", "", "pre-calculated signature for the artifact (defaults using ed25519ph)")
+	uploadCmd.Flags().StringVar(&uploadOpts.Checksum, "checksum", "", "pre-calculated checksum for the artifact (defaults using sha-512)")
+	uploadCmd.Flags().StringVar(&uploadOpts.SigningAlgorithm, "signing-algorithm", "ed25519ph", "the signing algorithm to use, one of: ed25519ph, ed25519")
+	uploadCmd.Flags().StringVar(&uploadOpts.SigningKeyPath, "signing-key", "", "path to ed25519 private key for signing the artifact [$KEYGEN_SIGNING_KEY_PATH=<path>, $KEYGEN_SIGNING_KEY=<key>]")
+	uploadCmd.Flags().BoolVar(&uploadOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
 		if keygenext.Account == "" {
@@ -116,19 +116,19 @@ func init() {
 	}
 
 	if v, ok := os.LookupEnv("KEYGEN_SIGNING_KEY_PATH"); ok {
-		if uploadOpts.signingKeyPath == "" {
-			uploadOpts.signingKeyPath = v
+		if uploadOpts.SigningKeyPath == "" {
+			uploadOpts.SigningKeyPath = v
 		}
 	}
 
 	if v, ok := os.LookupEnv("KEYGEN_SIGNING_KEY"); ok {
-		if uploadOpts.signingKey == "" {
-			uploadOpts.signingKey = v
+		if uploadOpts.SigningKey == "" {
+			uploadOpts.SigningKey = v
 		}
 	}
 
 	if _, ok := os.LookupEnv("KEYGEN_NO_AUTO_UPGRADE"); ok {
-		uploadOpts.noAutoUpgrade = true
+		uploadOpts.NoAutoUpgrade = true
 	}
 
 	if keygenext.Account == "" {
@@ -157,7 +157,7 @@ func uploadArgs(cmd *cobra.Command, args []string) error {
 }
 
 func uploadRun(cmd *cobra.Command, args []string) error {
-	if !uploadOpts.noAutoUpgrade {
+	if !uploadOpts.NoAutoUpgrade {
 		err := upgradeRun(nil, nil)
 		if err != nil {
 			return err
@@ -184,29 +184,29 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf(`path "%s" is a directory (must be a file)`, path)
 	}
 
-	platform := uploadOpts.platform
-	arch := uploadOpts.arch
+	platform := uploadOpts.Platform
+	arch := uploadOpts.Arch
 	filename := filepath.Base(info.Name())
 	filesize := info.Size()
 
 	// Allow filename to be overridden
-	if n := uploadOpts.filename; n != "" {
+	if n := uploadOpts.Filename; n != "" {
 		filename = n
 	}
 
 	// Allow filetype to be overridden
 	var filetype string
 
-	if uploadOpts.filetype == "<auto>" {
+	if uploadOpts.Filetype == "<auto>" {
 		filetype = filepath.Ext(filename)
 		if _, e := strconv.Atoi(filetype); e == nil {
 			filetype = ""
 		}
 	} else {
-		filetype = uploadOpts.filetype
+		filetype = uploadOpts.Filetype
 	}
 
-	checksum := uploadOpts.checksum
+	checksum := uploadOpts.Checksum
 	if checksum == "" {
 		checksum, err = calculateChecksum(file)
 		if err != nil {
@@ -214,13 +214,13 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	signature := uploadOpts.signature
-	if signature == "" && (uploadOpts.signingKeyPath != "" || uploadOpts.signingKey != "") {
+	signature := uploadOpts.Signature
+	if signature == "" && (uploadOpts.SigningKeyPath != "" || uploadOpts.SigningKey != "") {
 		var key string
 
 		switch {
-		case uploadOpts.signingKeyPath != "":
-			path, err := homedir.Expand(uploadOpts.signingKeyPath)
+		case uploadOpts.SigningKeyPath != "":
+			path, err := homedir.Expand(uploadOpts.SigningKeyPath)
 			if err != nil {
 				return fmt.Errorf(`signing-key path is not expandable (%s)`, err)
 			}
@@ -231,8 +231,8 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 			}
 
 			key = string(b)
-		case uploadOpts.signingKey != "":
-			key = uploadOpts.signingKey
+		case uploadOpts.SigningKey != "":
+			key = uploadOpts.SigningKey
 		}
 
 		signature, err = calculateSignature(key, file)
@@ -242,7 +242,7 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 	}
 
 	release := &keygenext.Release{
-		ID: uploadOpts.release,
+		ID: uploadOpts.Release,
 	}
 
 	if err := release.Get(); err != nil {
@@ -353,7 +353,7 @@ func calculateSignature(encSigningKey string, file *os.File) (string, error) {
 	signingKey := ed25519.PrivateKey(decSigningKey)
 	var sig []byte
 
-	switch uploadOpts.signingAlgorithm {
+	switch uploadOpts.SigningAlgorithm {
 	case "ed25519ph":
 		// We're using Ed25519ph which expects a pre-hashed message using SHA-512
 		h := sha512.New()
@@ -382,7 +382,7 @@ func calculateSignature(encSigningKey string, file *os.File) (string, error) {
 			return "", err
 		}
 	default:
-		return "", fmt.Errorf(`signing algorithm "%s" is not supported`, uploadOpts.signingAlgorithm)
+		return "", fmt.Errorf(`signing algorithm "%s" is not supported`, uploadOpts.SigningAlgorithm)
 	}
 
 	return base64.RawStdEncoding.EncodeToString(sig), nil

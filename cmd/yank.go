@@ -30,8 +30,8 @@ Docs:
 )
 
 type YankCommandOptions struct {
-	release       string
-	noAutoUpgrade bool
+	Release       string
+	NoAutoUpgrade bool
 }
 
 func init() {
@@ -40,8 +40,8 @@ func init() {
 	yankCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product or environment token [$KEYGEN_TOKEN] (required)")
 	yankCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	yankCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
-	yankCmd.Flags().StringVar(&yankOpts.release, "release", "", "the release identifier (required)")
-	yankCmd.Flags().BoolVar(&yankOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
+	yankCmd.Flags().StringVar(&yankOpts.Release, "release", "", "the release identifier (required)")
+	yankCmd.Flags().BoolVar(&yankOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
 		if keygenext.Account == "" {
@@ -80,7 +80,7 @@ func init() {
 	}
 
 	if _, ok := os.LookupEnv("KEYGEN_NO_AUTO_UPGRADE"); ok {
-		yankOpts.noAutoUpgrade = true
+		yankOpts.NoAutoUpgrade = true
 	}
 
 	if keygenext.Account == "" {
@@ -101,7 +101,7 @@ func init() {
 }
 
 func yankRun(cmd *cobra.Command, args []string) error {
-	if !yankOpts.noAutoUpgrade {
+	if !yankOpts.NoAutoUpgrade {
 		err := upgradeRun(nil, nil)
 		if err != nil {
 			return err
@@ -109,7 +109,7 @@ func yankRun(cmd *cobra.Command, args []string) error {
 	}
 
 	release := &keygenext.Release{
-		ID: yankOpts.release,
+		ID: yankOpts.Release,
 	}
 
 	if err := release.Yank(); err != nil {

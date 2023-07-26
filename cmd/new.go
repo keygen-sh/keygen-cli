@@ -33,13 +33,14 @@ Docs:
 )
 
 type DraftCommandOptions struct {
-	name          string
-	description   string
-	version       string
-	tag           string
-	channel       string
-	entitlements  []string
-	noAutoUpgrade bool
+	Name          string
+	Description   string
+	Version       string
+	Tag           string
+	Channel       string
+	Package       string
+	Entitlements  []string
+	NoAutoUpgrade bool
 }
 
 func init() {
@@ -48,13 +49,14 @@ func init() {
 	draftCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh product or environment token [$KEYGEN_TOKEN] (required)")
 	draftCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	draftCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
-	draftCmd.Flags().StringVar(&draftOpts.version, "version", "", "version for the release (required)")
-	draftCmd.Flags().StringVar(&draftOpts.tag, "tag", "", "tag for the release")
-	draftCmd.Flags().StringVar(&draftOpts.name, "name", "", "human-readable name for the release")
-	draftCmd.Flags().StringVar(&draftOpts.description, "description", "", "description for the release (e.g. release notes)")
-	draftCmd.Flags().StringVar(&draftOpts.channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
-	draftCmd.Flags().BoolVar(&draftOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
-	draftCmd.Flags().StringSliceVar(&draftOpts.entitlements, "entitlements", []string{}, "comma seperated list of entitlement constraints (e.g. --entitlements <id>,<id>,...)")
+	draftCmd.Flags().StringVar(&draftOpts.Version, "version", "", "version for the release (required)")
+	draftCmd.Flags().StringVar(&draftOpts.Tag, "tag", "", "tag for the release")
+	draftCmd.Flags().StringVar(&draftOpts.Name, "name", "", "human-readable name for the release")
+	draftCmd.Flags().StringVar(&draftOpts.Description, "description", "", "description for the release (e.g. release notes)")
+	draftCmd.Flags().StringVar(&draftOpts.Channel, "channel", "stable", "channel for the release, one of: stable, rc, beta, alpha, dev")
+	draftCmd.Flags().StringVar(&draftOpts.Package, "package", "", "package identifier for the release")
+	draftCmd.Flags().BoolVar(&draftOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
+	draftCmd.Flags().StringSliceVar(&draftOpts.Entitlements, "entitlements", []string{}, "comma seperated list of entitlement constraints (e.g. --entitlements <id>,<id>,...)")
 
 	// TODO(ezekg) Prompt multi-line description input from stdin if "--"?
 	// TODO(ezekg) Add metadata flag
@@ -96,7 +98,7 @@ func init() {
 	}
 
 	if _, ok := os.LookupEnv("KEYGEN_NO_AUTO_UPGRADE"); ok {
-		draftOpts.noAutoUpgrade = true
+		draftOpts.NoAutoUpgrade = true
 	}
 
 	if keygenext.Account == "" {
@@ -117,38 +119,43 @@ func init() {
 }
 
 func draftRun(cmd *cobra.Command, args []string) error {
-	if !draftOpts.noAutoUpgrade {
+	if !draftOpts.NoAutoUpgrade {
 		err := upgradeRun(nil, nil)
 		if err != nil {
 			return err
 		}
 	}
 
-	channel := draftOpts.channel
+	channel := draftOpts.Channel
 
 	var constraints keygenext.Constraints
-	if e := draftOpts.entitlements; len(e) != 0 {
+	if e := draftOpts.Entitlements; len(e) != 0 {
 		constraints = constraints.From(e)
 	}
 
 	var tag *string
-	if t := draftOpts.tag; t != "" {
+	if t := draftOpts.Tag; t != "" {
 		tag = &t
 	}
 
 	var name *string
-	if n := draftOpts.name; n != "" {
+	if n := draftOpts.Name; n != "" {
 		name = &n
 	}
 
 	var desc *string
-	if d := draftOpts.description; d != "" {
+	if d := draftOpts.Description; d != "" {
 		desc = &d
 	}
 
-	version, err := semver.NewVersion(draftOpts.version)
+	var pkg *string
+	if p := draftOpts.Package; p != "" {
+		pkg = &p
+	}
+
+	version, err := semver.NewVersion(draftOpts.Version)
 	if err != nil {
-		return fmt.Errorf(`version "%s" is not acceptable (%s)`, draftOpts.version, italic(strings.ToLower(err.Error())))
+		return fmt.Errorf(`version "%s" is not acceptable (%s)`, draftOpts.Version, italic(strings.ToLower(err.Error())))
 	}
 
 	release := &keygenext.Release{
@@ -158,6 +165,7 @@ func draftRun(cmd *cobra.Command, args []string) error {
 		Tag:         tag,
 		Channel:     channel,
 		ProductID:   keygenext.Product,
+		PackageID:   pkg,
 		Constraints: constraints,
 	}
 

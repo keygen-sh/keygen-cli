@@ -30,8 +30,8 @@ Docs:
 )
 
 type DeleteCommandOptions struct {
-	release       string
-	noAutoUpgrade bool
+	Release       string
+	NoAutoUpgrade bool
 }
 
 func init() {
@@ -40,8 +40,8 @@ func init() {
 	delCmd.Flags().StringVar(&keygenext.Token, "token", "", "your keygen.sh environment or product token [$KEYGEN_TOKEN] (required)")
 	delCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	delCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
-	delCmd.Flags().StringVar(&delOpts.release, "release", "", "the release identifier (required)")
-	delCmd.Flags().BoolVar(&delOpts.noAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
+	delCmd.Flags().StringVar(&delOpts.Release, "release", "", "the release identifier (required)")
+	delCmd.Flags().BoolVar(&delOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
 		if keygenext.Account == "" {
@@ -80,7 +80,7 @@ func init() {
 	}
 
 	if _, ok := os.LookupEnv("KEYGEN_NO_AUTO_UPGRADE"); ok {
-		delOpts.noAutoUpgrade = true
+		delOpts.NoAutoUpgrade = true
 	}
 
 	if keygenext.Account == "" {
@@ -101,7 +101,7 @@ func init() {
 }
 
 func delRun(cmd *cobra.Command, args []string) error {
-	if !delOpts.noAutoUpgrade {
+	if !delOpts.NoAutoUpgrade {
 		err := upgradeRun(nil, nil)
 		if err != nil {
 			return err
@@ -109,7 +109,7 @@ func delRun(cmd *cobra.Command, args []string) error {
 	}
 
 	release := &keygenext.Release{
-		ID: delOpts.release,
+		ID: delOpts.Release,
 	}
 
 	if err := release.Delete(); err != nil {

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+arg1="${1}"
+
 log_info() {
   echo "[info] ${1}"
 }
@@ -84,13 +86,14 @@ get_bin_name() {
 }
 
 get_bin_path() {
-  path="/usr/local/bin/${BIN_NAME}"
-  if [ "${OS}" = 'windows' ]
-  then
-    path="./${BIN_NAME}"
+  base="/usr/local/bin"
+  if [ "${arg1}" != "" ]; then
+    base="${arg1}"
+  elif [ "${OS}" = 'windows' ]; then
+    base="."
   fi
-
-  echo "${path}"
+  
+  echo "${base}/${BIN_NAME}"
 }
 
 get_bin_version() {

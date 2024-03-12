@@ -189,10 +189,10 @@ github.com/jstemmer/go-junit-report v0.9.1/go.mod h1:Brl9GWCQeLvo8nXZwPNNblvFj/X
 github.com/jtolds/gls v4.20.0+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfVYBRgL+9YlvaHOwJU=
 github.com/keygen-sh/go-update v1.0.0 h1:M65sTVUHUO07tEK4l1Hq7u5D4kdEqkcgfdzUt3q3S08=
 github.com/keygen-sh/go-update v1.0.0/go.mod h1:wn0UWRHLnBP5hwXtj1IdHZqWlHvIadh2Nn+becFf8Ro=
-github.com/keygen-sh/jsonapi-go v1.2.0 h1:BXVX9YAZt4itgTs9sV0ame0/+6WQMZHhbF8f62paNwo=
-github.com/keygen-sh/jsonapi-go v1.2.0/go.mod h1:8j9vsLiKyJyDqmt8r3tYaYNmXszq2+cFhoO6QdMdAes=
-github.com/keygen-sh/keygen-go/v2 v2.6.0 h1:AH7Kh8trdq836kf4D7wfaBmlhNga3f83/gVNnwYWyBU=
-github.com/keygen-sh/keygen-go/v2 v2.6.0/go.mod h1:npC1vHkQzB/PmsHWQmzHQvcPMTUnRQD3F9W4iDdif38=
+github.com/keygen-sh/jsonapi-go v1.2.1 h1:NTSIAxl2+7S5fPnKgrYwNjQSWbdKRtrFq26SD8AOkiU=
+github.com/keygen-sh/jsonapi-go v1.2.1/go.mod h1:8j9vsLiKyJyDqmt8r3tYaYNmXszq2+cFhoO6QdMdAes=
+github.com/keygen-sh/keygen-go/v2 v2.9.0 h1:bdoaKkaeb5aBy+odwfBNZPKFm4Vjy5vCkH0jSYArhtU=
+github.com/keygen-sh/keygen-go/v2 v2.9.0/go.mod h1:fiEdQRsGQdojesxXBsVrQZc6k5qIxiOWKE7Ofc0ymWk=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/kr/fs v0.1.0/go.mod h1:FFnZGqtBN9Gxj7eW1uZ42v5BccTP0vu6NEaFoC2HwRg=
@@ -438,6 +438,7 @@ golang.org/x/sys v0.0.0-20210510120138-977fb7262007/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20210910150752-751e447fb3d0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220325203850-36772127a21f/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a h1:dGzPydgVsqGcTRVwiLJ1jVbufYwmzD3LfVPLKsKg+0k=
 golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=

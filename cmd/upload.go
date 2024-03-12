@@ -54,6 +54,7 @@ type UploadCommandOptions struct {
 	Platform         string
 	Arch             string
 	Release          string
+	Package          string
 	Signature        string
 	Checksum         string
 	SigningAlgorithm string
@@ -69,6 +70,7 @@ func init() {
 	uploadCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	uploadCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
 	uploadCmd.Flags().StringVar(&uploadOpts.Release, "release", "", "the release identifier (required)")
+	uploadCmd.Flags().StringVar(&uploadOpts.Package, "package", "", "package identifier for the artifact")
 	uploadCmd.Flags().StringVar(&uploadOpts.Filename, "filename", "", "filename for the artifact (defaults to basename of <path>)")
 	uploadCmd.Flags().StringVar(&uploadOpts.Filetype, "filetype", "<auto>", "filetype for the artifact (defaults to extname of <path>)")
 	uploadCmd.Flags().StringVar(&uploadOpts.Platform, "platform", "", "platform for the artifact")
@@ -242,7 +244,8 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 	}
 
 	release := &keygenext.Release{
-		ID: uploadOpts.Release,
+		ID:        uploadOpts.Release,
+		PackageID: &uploadOpts.Package,
 	}
 
 	if err := release.Get(); err != nil {

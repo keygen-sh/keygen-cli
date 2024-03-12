@@ -1,6 +1,7 @@
 package keygenext
 
 import (
+	"github.com/google/go-querystring/query"
 	"github.com/keygen-sh/jsonapi-go"
 	"github.com/keygen-sh/keygen-go/v2"
 )
@@ -116,7 +117,23 @@ func (r *Release) Get() error {
 		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent, APIURL: APIURL},
 	)
 
-	res, err := client.Get("releases/"+r.ID, nil, r)
+	// TODO(ezekg) Add support for custom query params to SDK
+	type querystring struct {
+		Package string `url:"package,omitempty"`
+	}
+
+	qs := querystring{Package: *r.PackageID}
+	values, err := query.Values(qs)
+	if err != nil {
+		return err
+	}
+
+	url := "releases/" + r.ID
+	if enc := values.Encode(); enc != "" {
+		url += "?" + enc
+	}
+
+	res, err := client.Get(url, nil, r)
 	if err != nil {
 		if res != nil && len(res.Document.Errors) > 0 {
 			e := res.Document.Errors[0]

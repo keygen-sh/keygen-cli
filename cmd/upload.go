@@ -252,7 +252,11 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 				code = italic("(" + e.Code + ")")
 			}
 
-			return fmt.Errorf("%s: %s %s", e.Title, e.Detail, code)
+			if e.Source != "" {
+				return fmt.Errorf("%s: %s %s %s", e.Title, e.Source, e.Detail, code)
+			} else {
+				return fmt.Errorf("%s: %s %s", e.Title, e.Detail, code)
+			}
 		}
 
 		return err
@@ -276,7 +280,11 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 				code = italic("(" + e.Code + ")")
 			}
 
-			return fmt.Errorf("%s: %s %s", e.Title, e.Detail, code)
+			if e.Source != "" {
+				return fmt.Errorf("%s: %s %s %s", e.Title, e.Source, e.Detail, code)
+			} else {
+				return fmt.Errorf("%s: %s %s", e.Title, e.Detail, code)
+			}
 		}
 
 		return err

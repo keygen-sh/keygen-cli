@@ -4,6 +4,7 @@
 keygen-cli
 keygen
 cli
+main
 
 *.exe
 *.key

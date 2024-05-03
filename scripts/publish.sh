@@ -10,9 +10,22 @@ log_err() {
 }
 
 main() {
+  log_info "dogfooding v${VERSION}"
+
+  # Always dogfood the latest build
+  go build -o "$BIN" -ldflags "-X ${PACKAGE}.Version=${VERSION}"
+
+  if [ $? -eq 0 ]
+  then
+    log_info "successfully built v$($BIN version)"
+  else
+    log_err "failed to build v${VERSION}"
+  fi
+
   log_info "drafting v${VERSION}"
 
-  keygen new \
+  # Draft new version
+  $BIN new \
     --name "Keygen CLI v${VERSION}" \
     --channel "${CHANNEL}" \
     --version "${VERSION}"
@@ -24,6 +37,7 @@ main() {
     log_err "failed to draft v${VERSION}"
   fi
 
+  # Upload artifact for each platform
   for platform in $PLATFORMS
   do
     read -r os arch \
@@ -37,7 +51,7 @@ main() {
 
     log_info "uploading v${VERSION} for ${platform}: ${filename}"
 
-    keygen upload "build/${filename}" \
+    $BIN upload "build/${filename}" \
       --release "${VERSION}" \
       --platform "${os}" \
       --arch "${arch}"
@@ -51,15 +65,15 @@ main() {
   done
 
   # Upload installer
-  keygen upload 'build/install.sh' --release "${VERSION}"
+  $BIN upload 'build/install.sh' --release "${VERSION}"
 
   # Upload version
-  keygen upload 'build/version' \
+  $BIN upload 'build/version' \
     --release "${VERSION}" \
     --filetype 'txt'
 
   # Publish version
-  keygen publish --release "${VERSION}"
+  $BIN publish --release "${VERSION}"
 
   if [ $? -eq 0 ]
   then
@@ -71,11 +85,10 @@ main() {
   # We only want to do the rest for stable releases
   if [ "${CHANNEL}" = 'stable' ]
   then
-    # Untag latest
-    keygen untag --release 'latest'
+    $BIN untag --release 'latest'
 
     # Tag as latest
-    keygen tag 'latest' --release "${VERSION}"
+    $BIN tag 'latest' --release "${VERSION}"
 
     if [ $? -eq 0 ]
     then
@@ -86,9 +99,11 @@ main() {
   fi
 }
 
-PLATFORMS=$(go tool dist list | grep -vE 'ios|android|js|aix|illumos|riscv64|plan9|solaris|loong')
-VERSION=$(cat VERSION)
+PLATFORMS="$(go tool dist list | grep -vE 'ios|android|js|aix|illumos|riscv64|plan9|solaris|loong')"
+PACKAGE='github.com/keygen-sh/keygen-cli/cmd'
+VERSION="$(cat VERSION)"
 CHANNEL='stable'
+BIN='./build/keygen'
 
 case "${VERSION}"
 in

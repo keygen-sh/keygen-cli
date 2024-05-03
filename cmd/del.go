@@ -3,7 +3,9 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
+	"github.com/keygen-sh/jsonapi-go"
 	"github.com/keygen-sh/keygen-cli/internal/keygenext"
 	"github.com/spf13/cobra"
 )
@@ -12,7 +14,7 @@ var (
 	delOpts = &DeleteCommandOptions{}
 	delCmd  = &cobra.Command{
 		Use:   "del",
-		Short: "delete an existing release",
+		Short: "delete an existing release or artifact",
 		Example: `  keygen del \
       --account '1fddcec8-8dd3-4d8d-9b16-215cac0f9b52' \
       --product '2313b7e7-1ea6-4a01-901e-2931de6bb1e2' \
@@ -31,6 +33,7 @@ Docs:
 
 type DeleteCommandOptions struct {
 	Release       string
+	Artifact      string
 	NoAutoUpgrade bool
 }
 
@@ -41,6 +44,7 @@ func init() {
 	delCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	delCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
 	delCmd.Flags().StringVar(&delOpts.Release, "release", "", "the release identifier (required)")
+	delCmd.Flags().StringVar(&delOpts.Artifact, "artifact", "", "the artifact identifier")
 	delCmd.Flags().BoolVar(&delOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
@@ -108,11 +112,19 @@ func delRun(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	release := &keygenext.Release{
-		ID: delOpts.Release,
+	var deletable interface {
+		jsonapi.MarshalResourceIdentifier
+
+		Delete() error
+	}
+	switch {
+	case delOpts.Artifact != "":
+		deletable = &keygenext.Artifact{ReleaseID: &delOpts.Release, ID: delOpts.Artifact}
+	default:
+		deletable = &keygenext.Release{ID: delOpts.Release}
 	}
 
-	if err := release.Delete(); err != nil {
+	if err := deletable.Delete(); err != nil {
 		if e, ok := err.(*keygenext.Error); ok {
 			var code string
 			if e.Code != "" {
@@ -129,7 +141,9 @@ func delRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println(green("deleted:") + " release " + italic(release.ID))
+	fmt.Println(
+		green("deleted:") + " " + strings.TrimSuffix(deletable.GetType(), "s") + " " + italic(deletable.GetID()),
+	)
 
 	return nil
 }

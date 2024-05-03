@@ -6,22 +6,23 @@ import (
 	"mime"
 	"net/http"
 
+	"github.com/google/go-querystring/query"
 	"github.com/keygen-sh/jsonapi-go"
 	"github.com/keygen-sh/keygen-go/v2"
 )
 
 // Artifact represents a Keygen artifact object.
 type Artifact struct {
-	ID        string `json:"-"`
-	Type      string `json:"-"`
-	Filename  string `json:"filename,omitempty"`
-	Filetype  string `json:"filetype,omitempty"`
-	Filesize  int64  `json:"filesize,omitempty"`
-	Platform  string `json:"platform,omitempty"`
-	Arch      string `json:"arch,omitempty"`
-	Signature string `json:"signature,omitempty"`
-	Checksum  string `json:"checksum,omitempty"`
-	ReleaseID string `json:"-"`
+	ID        string  `json:"-"`
+	Type      string  `json:"-"`
+	Filename  string  `json:"filename,omitempty"`
+	Filetype  string  `json:"filetype,omitempty"`
+	Filesize  int64   `json:"filesize,omitempty"`
+	Platform  string  `json:"platform,omitempty"`
+	Arch      string  `json:"arch,omitempty"`
+	Signature string  `json:"signature,omitempty"`
+	Checksum  string  `json:"checksum,omitempty"`
+	ReleaseID *string `json:"-"`
 
 	url string `json:"-"`
 }
@@ -57,7 +58,7 @@ func (a Artifact) GetRelationships() map[string]interface{} {
 
 	relationships["release"] = jsonapi.ResourceObjectIdentifier{
 		Type: "releases",
-		ID:   a.ReleaseID,
+		ID:   *a.ReleaseID,
 	}
 
 	return relationships
@@ -111,6 +112,41 @@ func (a *Artifact) Upload(reader io.Reader) error {
 
 	if res.StatusCode != http.StatusOK {
 		return errors.New("failed to upload to storage provider")
+	}
+
+	return nil
+}
+
+func (a *Artifact) Delete() error {
+	client := keygen.NewClientWithOptions(
+		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent, APIURL: APIURL},
+	)
+
+	// TODO(ezekg) Add support for custom query params to SDK
+	type querystring struct {
+		Release string `url:"release,omitempty"`
+	}
+
+	qs := querystring{Release: *a.ReleaseID}
+	values, err := query.Values(qs)
+	if err != nil {
+		return err
+	}
+
+	url := "artifacts/" + a.ID
+	if enc := values.Encode(); enc != "" {
+		url += "?" + enc
+	}
+
+	res, err := client.Delete(url, nil, a)
+	if err != nil {
+		if res != nil && len(res.Document.Errors) > 0 {
+			e := res.Document.Errors[0]
+
+			return &Error{Title: e.Title, Detail: e.Detail, Source: e.Source.Pointer, Code: e.Code, Err: err}
+		}
+
+		return err
 	}
 
 	return nil

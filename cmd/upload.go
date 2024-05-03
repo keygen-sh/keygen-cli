@@ -273,7 +273,7 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 		Arch:      arch,
 		Signature: signature,
 		Checksum:  checksum,
-		ReleaseID: release.ID,
+		ReleaseID: &release.ID,
 	}
 
 	if err := artifact.Create(); err != nil {

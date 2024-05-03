@@ -44,8 +44,7 @@ main() {
   # Upload artifact for each platform
   for platform in $PLATFORMS
   do
-    read -r os arch \
-      <<<$(echo "${platform}" | tr '/' ' ')
+    IFS='/' read -r os arch <<< "$platform"
 
     filename="keygen_${os}_${arch}"
     if [ "${os}" = 'windows' ]

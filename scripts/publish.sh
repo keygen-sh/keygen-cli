@@ -4,6 +4,10 @@ log_info() {
   echo "[info] $1"
 }
 
+log_warn() {
+  echo "[warn] $1"
+}
+
 log_err() {
   echo "[error] $1"
   exit 1
@@ -85,7 +89,15 @@ main() {
   # We only want to do the rest for stable releases
   if [ "${CHANNEL}" = 'stable' ]
   then
+    # Untag previous latest if it exists (we'll continue even on failure)
     $BIN untag --release 'latest'
+
+    if [ $? -eq 0 ]
+    then
+      log_info "successfully untagged v${VERSION}"
+    else
+      log_warn "failed to untag v${VERSION}"
+    fi
 
     # Tag as latest
     $BIN tag 'latest' --release "${VERSION}"

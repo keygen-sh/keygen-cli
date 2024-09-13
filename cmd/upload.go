@@ -6,6 +6,7 @@ import (
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -36,7 +37,8 @@ var (
       --token 'prod-xxx' \
       --release '1.0.0' \
       --platform 'darwin' \
-      --arch 'amd64'
+      --arch 'amd64' \
+      --metadata '{"key": "value"}'
 
 Docs:
   https://keygen.sh/docs/cli/`,
@@ -61,6 +63,7 @@ type UploadCommandOptions struct {
 	SigningKeyPath   string
 	SigningKey       string
 	NoAutoUpgrade    bool
+	Metadata         string
 }
 
 func init() {
@@ -80,6 +83,7 @@ func init() {
 	uploadCmd.Flags().StringVar(&uploadOpts.SigningAlgorithm, "signing-algorithm", "ed25519ph", "the signing algorithm to use, one of: ed25519ph, ed25519")
 	uploadCmd.Flags().StringVar(&uploadOpts.SigningKeyPath, "signing-key", "", "path to ed25519 private key for signing the artifact [$KEYGEN_SIGNING_KEY_PATH=<path>, $KEYGEN_SIGNING_KEY=<key>]")
 	uploadCmd.Flags().BoolVar(&uploadOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
+	uploadCmd.Flags().StringVar(&uploadOpts.Metadata, "metadata", "", "JSON string of metadata key-value pairs")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
 		if keygenext.Account == "" {
@@ -243,6 +247,13 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	var metadata map[string]interface{}
+	if m := uploadOpts.Metadata; m != "" {
+		if err := json.Unmarshal([]byte(m), &metadata); err != nil {
+			return fmt.Errorf("invalid metadata JSON: %v", err)
+		}
+	}
+
 	release := &keygenext.Release{
 		ID:        uploadOpts.Release,
 		PackageID: &uploadOpts.Package,
@@ -274,6 +285,7 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 		Signature: signature,
 		Checksum:  checksum,
 		ReleaseID: &release.ID,
+		Metadata:  metadata,
 	}
 
 	if err := artifact.Create(); err != nil {

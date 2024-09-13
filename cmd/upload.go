@@ -61,6 +61,7 @@ type UploadCommandOptions struct {
 	SigningKeyPath   string
 	SigningKey       string
 	NoAutoUpgrade    bool
+	Metadata map[string]string
 }
 
 func init() {
@@ -80,6 +81,7 @@ func init() {
 	uploadCmd.Flags().StringVar(&uploadOpts.SigningAlgorithm, "signing-algorithm", "ed25519ph", "the signing algorithm to use, one of: ed25519ph, ed25519")
 	uploadCmd.Flags().StringVar(&uploadOpts.SigningKeyPath, "signing-key", "", "path to ed25519 private key for signing the artifact [$KEYGEN_SIGNING_KEY_PATH=<path>, $KEYGEN_SIGNING_KEY=<key>]")
 	uploadCmd.Flags().BoolVar(&uploadOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
+	uploadCmd.Flags().StringToStringVar(&uploadOpts.Metadata, "metadata", nil, "metadata key=value pairs for the artifact")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
 		if keygenext.Account == "" {

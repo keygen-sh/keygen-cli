@@ -41,6 +41,7 @@ type DraftCommandOptions struct {
 	Package       string
 	Entitlements  []string
 	NoAutoUpgrade bool
+	Metadata      map[string]string // Add metadata field
 }
 
 func init() {
@@ -57,6 +58,7 @@ func init() {
 	draftCmd.Flags().StringVar(&draftOpts.Package, "package", "", "package identifier for the release")
 	draftCmd.Flags().BoolVar(&draftOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 	draftCmd.Flags().StringSliceVar(&draftOpts.Entitlements, "entitlements", []string{}, "comma seperated list of entitlement constraints (e.g. --entitlements <id>,<id>,...)")
+	draftCmd.Flags().StringToStringVar(&draftOpts.Metadata, "metadata", map[string]string{}, "metadata for the release as key-value pairs (e.g. --metadata key1=value1,key2=value2)")
 
 	// TODO(ezekg) Prompt multi-line description input from stdin if "--"?
 	// TODO(ezekg) Add metadata flag
@@ -167,6 +169,7 @@ func draftRun(cmd *cobra.Command, args []string) error {
 		ProductID:   keygenext.Product,
 		PackageID:   pkg,
 		Constraints: constraints,
+		Metadata:    draftOpts.Metadata, // Include the metadata here
 	}
 
 	if err := release.Create(); err != nil {

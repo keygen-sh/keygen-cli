@@ -23,6 +23,7 @@ type Artifact struct {
 	Signature string  `json:"signature,omitempty"`
 	Checksum  string  `json:"checksum,omitempty"`
 	ReleaseID *string `json:"-"`
+	Metadata map[string]string `json:"metadata,omitempty"`
 
 	url string `json:"-"`
 }

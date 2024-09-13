@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -20,7 +21,8 @@ var (
       --product '2313b7e7-1ea6-4a01-901e-2931de6bb1e2' \
       --token 'prod-xxx' \
       --channel 'beta' \
-      --version '1.0.0'
+      --version '1.0.0' \
+      --metadata '{"key": "value"}'
 
 Docs:
   https://keygen.sh/docs/cli/`,
@@ -41,6 +43,7 @@ type DraftCommandOptions struct {
 	Package       string
 	Entitlements  []string
 	NoAutoUpgrade bool
+	Metadata      string
 }
 
 func init() {
@@ -57,9 +60,9 @@ func init() {
 	draftCmd.Flags().StringVar(&draftOpts.Package, "package", "", "package identifier for the release")
 	draftCmd.Flags().BoolVar(&draftOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 	draftCmd.Flags().StringSliceVar(&draftOpts.Entitlements, "entitlements", []string{}, "comma seperated list of entitlement constraints (e.g. --entitlements <id>,<id>,...)")
+	draftCmd.Flags().StringVar(&draftOpts.Metadata, "metadata", "", "JSON string of metadata key-value pairs")
 
 	// TODO(ezekg) Prompt multi-line description input from stdin if "--"?
-	// TODO(ezekg) Add metadata flag
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
 		if keygenext.Account == "" {
@@ -158,6 +161,13 @@ func draftRun(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf(`version "%s" is not acceptable (%s)`, draftOpts.Version, italic(strings.ToLower(err.Error())))
 	}
 
+	var metadata map[string]interface{}
+	if m := draftOpts.Metadata; m != "" {
+		if err := json.Unmarshal([]byte(m), &metadata); err != nil {
+			return fmt.Errorf("invalid metadata JSON: %v", err)
+		}
+	}
+
 	release := &keygenext.Release{
 		Name:        name,
 		Description: desc,
@@ -167,6 +177,7 @@ func draftRun(cmd *cobra.Command, args []string) error {
 		ProductID:   keygenext.Product,
 		PackageID:   pkg,
 		Constraints: constraints,
+		Metadata:    metadata,
 	}
 
 	if err := release.Create(); err != nil {

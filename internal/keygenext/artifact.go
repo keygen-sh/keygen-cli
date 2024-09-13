@@ -13,16 +13,17 @@ import (
 
 // Artifact represents a Keygen artifact object.
 type Artifact struct {
-	ID        string  `json:"-"`
-	Type      string  `json:"-"`
-	Filename  string  `json:"filename,omitempty"`
-	Filetype  string  `json:"filetype,omitempty"`
-	Filesize  int64   `json:"filesize,omitempty"`
-	Platform  string  `json:"platform,omitempty"`
-	Arch      string  `json:"arch,omitempty"`
-	Signature string  `json:"signature,omitempty"`
-	Checksum  string  `json:"checksum,omitempty"`
-	ReleaseID *string `json:"-"`
+	ID        string                 `json:"-"`
+	Type      string                 `json:"-"`
+	Filename  string                 `json:"filename,omitempty"`
+	Filetype  string                 `json:"filetype,omitempty"`
+	Filesize  int64                  `json:"filesize,omitempty"`
+	Platform  string                 `json:"platform,omitempty"`
+	Arch      string                 `json:"arch,omitempty"`
+	Signature string                 `json:"signature,omitempty"`
+	Checksum  string                 `json:"checksum,omitempty"`
+	ReleaseID *string                `json:"-"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 
 	url string `json:"-"`
 }

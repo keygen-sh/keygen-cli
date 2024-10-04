@@ -141,8 +141,10 @@ func tagRun(cmd *cobra.Command, args []string) error {
 	}
 
 	// update tag
-	release.Tag = &args[0]
-
+	release = &keygenext.Release{
+		ID:  release.ID,
+		Tag: &args[0],
+	}
 	if err := release.Update(); err != nil {
 		if e, ok := err.(*keygenext.Error); ok {
 			var code string

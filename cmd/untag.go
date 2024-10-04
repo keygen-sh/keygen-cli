@@ -132,8 +132,10 @@ func untagRun(cmd *cobra.Command, args []string) error {
 	}
 
 	// remove tag
-	release.Tag = nil
-
+	release = &keygenext.Release{
+		ID:  release.ID,
+		Tag: nil,
+	}
 	if err := release.Update(); err != nil {
 		if e, ok := err.(*keygenext.Error); ok {
 			var code string

@@ -17,7 +17,7 @@ main() {
   log_info "dogfooding v${VERSION}"
 
   # Always dogfood the latest build
-  go build -o "$BIN" -ldflags "-X ${PACKAGE}.Version=${VERSION}"
+  go build -o "$BIN" -ldflags "-s -w -X ${PACKAGE}.Version=${VERSION}"
 
   if [ $? -eq 0 ]
   then

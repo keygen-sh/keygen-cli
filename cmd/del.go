@@ -23,16 +23,15 @@ var (
 
 Docs:
   https://keygen.sh/docs/cli/`,
-		Args: cobra.NoArgs,
-		RunE: delRun,
-
-		// Encountering an error should not display usage
+		Args:         cobra.NoArgs,
+		RunE:         delRun,
 		SilenceUsage: true,
 	}
 )
 
 type DeleteCommandOptions struct {
 	Release       string
+	Package       string
 	Artifact      string
 	NoAutoUpgrade bool
 }
@@ -44,6 +43,7 @@ func init() {
 	delCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	delCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
 	delCmd.Flags().StringVar(&delOpts.Release, "release", "", "the release identifier (required)")
+	delCmd.Flags().StringVar(&delOpts.Package, "package", "", "package identifier for the release")
 	delCmd.Flags().StringVar(&delOpts.Artifact, "artifact", "", "the artifact identifier")
 	delCmd.Flags().BoolVar(&delOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
@@ -114,14 +114,36 @@ func delRun(cmd *cobra.Command, args []string) error {
 
 	var deletable interface {
 		jsonapi.MarshalResourceIdentifier
-
 		Delete() error
 	}
+
 	switch {
 	case delOpts.Artifact != "":
 		deletable = &keygenext.Artifact{ReleaseID: &delOpts.Release, ID: delOpts.Artifact}
 	default:
-		deletable = &keygenext.Release{ID: delOpts.Release}
+		release := &keygenext.Release{
+			ID:        delOpts.Release,
+			PackageID: &delOpts.Package,
+		}
+
+		if err := release.Get(); err != nil {
+			if e, ok := err.(*keygenext.Error); ok {
+				var code string
+				if e.Code != "" {
+					code = italic("(" + e.Code + ")")
+				}
+
+				if e.Source != "" {
+					return fmt.Errorf("%s: %s %s %s", e.Title, e.Source, e.Detail, code)
+				} else {
+					return fmt.Errorf("%s: %s %s", e.Title, e.Detail, code)
+				}
+			}
+
+			return err
+		}
+
+		deletable = release
 	}
 
 	if err := deletable.Delete(); err != nil {

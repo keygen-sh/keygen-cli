@@ -21,16 +21,15 @@ var (
 
 Docs:
   https://keygen.sh/docs/cli/`,
-		Args: cobra.NoArgs,
-		RunE: untagRun,
-
-		// Encountering an error should not display usage
+		Args:         cobra.NoArgs,
+		RunE:         untagRun,
 		SilenceUsage: true,
 	}
 )
 
 type UntagCommandOptions struct {
 	Release       string
+	Package       string
 	NoAutoUpgrade bool
 }
 
@@ -41,6 +40,7 @@ func init() {
 	untagCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	untagCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
 	untagCmd.Flags().StringVar(&untagOpts.Release, "release", "", "the release identifier (required)")
+	untagCmd.Flags().StringVar(&untagOpts.Package, "package", "", "package identifier for the release")
 	untagCmd.Flags().BoolVar(&untagOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
@@ -109,9 +109,28 @@ func untagRun(cmd *cobra.Command, args []string) error {
 	}
 
 	release := &keygenext.Release{
-		ID:  untagOpts.Release,
-		Tag: nil,
+		ID:        untagOpts.Release,
+		PackageID: &untagOpts.Package,
 	}
+
+	if err := release.Get(); err != nil {
+		if e, ok := err.(*keygenext.Error); ok {
+			var code string
+			if e.Code != "" {
+				code = italic("(" + e.Code + ")")
+			}
+
+			if e.Source != "" {
+				return fmt.Errorf("%s: %s %s %s", e.Title, e.Source, e.Detail, code)
+			} else {
+				return fmt.Errorf("%s: %s %s", e.Title, e.Detail, code)
+			}
+		}
+
+		return err
+	}
+
+	release.Tag = nil
 
 	if err := release.Update(); err != nil {
 		if e, ok := err.(*keygenext.Error); ok {

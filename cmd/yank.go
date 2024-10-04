@@ -21,16 +21,15 @@ var (
 
 Docs:
   https://keygen.sh/docs/cli/`,
-		Args: cobra.NoArgs,
-		RunE: yankRun,
-
-		// Encountering an error should not display usage
+		Args:         cobra.NoArgs,
+		RunE:         yankRun,
 		SilenceUsage: true,
 	}
 )
 
 type YankCommandOptions struct {
 	Release       string
+	Package       string
 	NoAutoUpgrade bool
 }
 
@@ -41,6 +40,7 @@ func init() {
 	yankCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	yankCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
 	yankCmd.Flags().StringVar(&yankOpts.Release, "release", "", "the release identifier (required)")
+	yankCmd.Flags().StringVar(&yankOpts.Package, "package", "", "package identifier for the release")
 	yankCmd.Flags().BoolVar(&yankOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
@@ -109,7 +109,25 @@ func yankRun(cmd *cobra.Command, args []string) error {
 	}
 
 	release := &keygenext.Release{
-		ID: yankOpts.Release,
+		ID:        yankOpts.Release,
+		PackageID: &yankOpts.Package,
+	}
+
+	if err := release.Get(); err != nil {
+		if e, ok := err.(*keygenext.Error); ok {
+			var code string
+			if e.Code != "" {
+				code = italic("(" + e.Code + ")")
+			}
+
+			if e.Source != "" {
+				return fmt.Errorf("%s: %s %s %s", e.Title, e.Source, e.Detail, code)
+			} else {
+				return fmt.Errorf("%s: %s %s", e.Title, e.Detail, code)
+			}
+		}
+
+		return err
 	}
 
 	if err := release.Yank(); err != nil {

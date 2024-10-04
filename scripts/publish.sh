@@ -110,7 +110,7 @@ main() {
   fi
 }
 
-PLATFORMS="$(go tool dist list | grep -vE 'ios|android|js|aix|illumos|riscv64|plan9|solaris|loong')"
+PLATFORMS="$(go tool dist list | grep -vE 'ios|android|js|aix|illumos|riscv64|plan9|solaris|loong|ppc64|wasm')"
 PACKAGE='github.com/keygen-sh/keygen-cli/cmd'
 VERSION="$(cat VERSION)"
 CHANNEL='stable'

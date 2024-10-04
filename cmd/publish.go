@@ -113,6 +113,7 @@ func publishRun(cmd *cobra.Command, args []string) error {
 		PackageID: &publishOpts.Package,
 	}
 
+	// get actual release id w/ filters e.g. package
 	if err := release.Get(); err != nil {
 		if e, ok := err.(*keygenext.Error); ok {
 			var code string

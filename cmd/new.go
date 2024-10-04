@@ -151,11 +151,6 @@ func draftRun(cmd *cobra.Command, args []string) error {
 		desc = &d
 	}
 
-	var pkg *string
-	if p := draftOpts.Package; p != "" {
-		pkg = &p
-	}
-
 	version, err := semver.NewVersion(draftOpts.Version)
 	if err != nil {
 		return fmt.Errorf(`version "%s" is not acceptable (%s)`, draftOpts.Version, italic(strings.ToLower(err.Error())))
@@ -166,6 +161,31 @@ func draftRun(cmd *cobra.Command, args []string) error {
 		if err := json.Unmarshal([]byte(m), &metadata); err != nil {
 			return fmt.Errorf("invalid metadata JSON: %v", err)
 		}
+	}
+
+	var pkg *string
+	if id := draftOpts.Package; id != "" {
+		p := &keygenext.Package{ID: id}
+
+		// get actual package id e.g. id is key ident
+		if err := p.Get(); err != nil {
+			if e, ok := err.(*keygenext.Error); ok {
+				var code string
+				if e.Code != "" {
+					code = italic("(" + e.Code + ")")
+				}
+
+				if e.Source != "" {
+					return fmt.Errorf("%s: %s %s %s", e.Title, e.Source, e.Detail, code)
+				} else {
+					return fmt.Errorf("%s: %s %s", e.Title, e.Detail, code)
+				}
+			}
+
+			return err
+		}
+
+		pkg = &p.ID
 	}
 
 	release := &keygenext.Release{
@@ -179,7 +199,6 @@ func draftRun(cmd *cobra.Command, args []string) error {
 		Constraints: constraints,
 		Metadata:    metadata,
 	}
-
 	if err := release.Create(); err != nil {
 		if e, ok := err.(*keygenext.Error); ok {
 			var code string

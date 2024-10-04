@@ -130,6 +130,7 @@ func untagRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	// remove tag
 	release.Tag = nil
 
 	if err := release.Update(); err != nil {

@@ -139,6 +139,7 @@ func tagRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	// update tag
 	release.Tag = &args[0]
 
 	if err := release.Update(); err != nil {

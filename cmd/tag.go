@@ -33,6 +33,7 @@ Docs:
 type TagCommandOptions struct {
 	Release       string
 	NoAutoUpgrade bool
+	Package       string
 }
 
 func init() {
@@ -42,6 +43,7 @@ func init() {
 	tagCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	tagCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
 	tagCmd.Flags().StringVar(&tagOpts.Release, "release", "", "the release identifier (required)")
+	tagCmd.Flags().StringVar(&tagOpts.Package, "package", "", "the package identifier")
 	tagCmd.Flags().BoolVar(&tagOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
@@ -118,8 +120,9 @@ func tagRun(cmd *cobra.Command, args []string) error {
 	}
 
 	release := &keygenext.Release{
-		ID:  tagOpts.Release,
-		Tag: &args[0],
+		ID:        tagOpts.Release,
+		Tag:       &args[0],
+		PackageID: &tagOpts.Package,
 	}
 
 	if err := release.Update(); err != nil {

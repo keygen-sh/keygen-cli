@@ -35,6 +35,7 @@ type DeleteCommandOptions struct {
 	Release       string
 	Artifact      string
 	NoAutoUpgrade bool
+	Package       string
 }
 
 func init() {
@@ -45,6 +46,7 @@ func init() {
 	delCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
 	delCmd.Flags().StringVar(&delOpts.Release, "release", "", "the release identifier (required)")
 	delCmd.Flags().StringVar(&delOpts.Artifact, "artifact", "", "the artifact identifier")
+	delCmd.Flags().StringVar(&delOpts.Package, "package", "", "the package identifier")
 	delCmd.Flags().BoolVar(&delOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
@@ -121,7 +123,10 @@ func delRun(cmd *cobra.Command, args []string) error {
 	case delOpts.Artifact != "":
 		deletable = &keygenext.Artifact{ReleaseID: &delOpts.Release, ID: delOpts.Artifact}
 	default:
-		deletable = &keygenext.Release{ID: delOpts.Release}
+		deletable = &keygenext.Release{
+			ID:        delOpts.Release,
+			PackageID: &delOpts.Package,
+		}
 	}
 
 	if err := deletable.Delete(); err != nil {

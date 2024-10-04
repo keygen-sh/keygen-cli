@@ -32,6 +32,7 @@ Docs:
 type YankCommandOptions struct {
 	Release       string
 	NoAutoUpgrade bool
+	Package       string
 }
 
 func init() {
@@ -41,6 +42,7 @@ func init() {
 	yankCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	yankCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
 	yankCmd.Flags().StringVar(&yankOpts.Release, "release", "", "the release identifier (required)")
+	yankCmd.Flags().StringVar(&yankOpts.Package, "package", "", "the package identifier")
 	yankCmd.Flags().BoolVar(&yankOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
@@ -109,7 +111,8 @@ func yankRun(cmd *cobra.Command, args []string) error {
 	}
 
 	release := &keygenext.Release{
-		ID: yankOpts.Release,
+		ID:        yankOpts.Release,
+		PackageID: &yankOpts.Package,
 	}
 
 	if err := release.Yank(); err != nil {

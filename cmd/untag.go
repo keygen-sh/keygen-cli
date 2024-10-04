@@ -32,6 +32,7 @@ Docs:
 type UntagCommandOptions struct {
 	Release       string
 	NoAutoUpgrade bool
+	Package       string
 }
 
 func init() {
@@ -41,6 +42,7 @@ func init() {
 	untagCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	untagCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
 	untagCmd.Flags().StringVar(&untagOpts.Release, "release", "", "the release identifier (required)")
+	untagCmd.Flags().StringVar(&untagOpts.Package, "package", "", "the package identifier")
 	untagCmd.Flags().BoolVar(&untagOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
@@ -109,8 +111,9 @@ func untagRun(cmd *cobra.Command, args []string) error {
 	}
 
 	release := &keygenext.Release{
-		ID:  untagOpts.Release,
-		Tag: nil,
+		ID:        untagOpts.Release,
+		Tag:       nil,
+		PackageID: &untagOpts.Package,
 	}
 
 	if err := release.Update(); err != nil {

@@ -32,6 +32,7 @@ Docs:
 type PublishCommandOptions struct {
 	Release       string
 	NoAutoUpgrade bool
+	Package       string
 }
 
 func init() {
@@ -41,6 +42,7 @@ func init() {
 	publishCmd.Flags().StringVar(&keygenext.Environment, "environment", "", "your keygen.sh environment identifier [$KEYGEN_ENVIRONMENT=<id>]")
 	publishCmd.Flags().StringVar(&keygenext.APIURL, "host", "", "the host of the keygen server [$KEYGEN_HOST=<host>]")
 	publishCmd.Flags().StringVar(&publishOpts.Release, "release", "", "the release identifier (required)")
+	publishCmd.Flags().StringVar(&publishOpts.Package, "package", "", "the package identifier")
 	publishCmd.Flags().BoolVar(&publishOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 
 	if v, ok := os.LookupEnv("KEYGEN_ACCOUNT_ID"); ok {
@@ -109,7 +111,8 @@ func publishRun(cmd *cobra.Command, args []string) error {
 	}
 
 	release := &keygenext.Release{
-		ID: publishOpts.Release,
+		ID:        publishOpts.Release,
+		PackageID: &publishOpts.Package,
 	}
 
 	if err := release.Publish(); err != nil {

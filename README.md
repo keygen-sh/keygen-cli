@@ -1,5 +1,7 @@
 # Keygen CLI
 
+[![CI](https://github.com/keygen-sh/keygen-cli/actions/workflows/test.yml/badge.svg)](https://github.com/keygen-sh/keygen-cli/actions)
+
 CLI to interact with keygen.sh.
 
 ## Installation

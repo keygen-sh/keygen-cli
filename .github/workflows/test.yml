@@ -1,0 +1,24 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+      - name: Build
+        run: go build -o /dev/null main.go
+      - name: Vet
+        run: go vet ./...
+      - name: Fmt
+        run: test -z "$(go fmt ./...)"

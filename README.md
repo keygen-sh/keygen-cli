@@ -11,7 +11,7 @@ you can install manually by downloading a binary and following [the install
 instructions here](https://keygen.sh/docs/cli/).
 
 ```bash
-curl -sSL https://get.keygen.sh/keygen/latest/install.sh | sh
+curl -sSL https://raw.pkg.keygen.sh/keygen/cli/latest/install.sh | sh
 ```
 
 ## Commands

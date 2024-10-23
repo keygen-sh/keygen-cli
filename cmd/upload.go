@@ -59,10 +59,12 @@ type UploadCommandOptions struct {
 	Arch              string
 	Release           string
 	Package           string
-	Signature         string
 	Checksum          string
 	ChecksumAlgorithm string
+	ChecksumEncoding  string
+	Signature         string
 	SigningAlgorithm  string
+	SignatureEncoding string
 	SigningKeyPath    string
 	SigningKey        string
 	NoAutoUpgrade     bool
@@ -82,9 +84,11 @@ func init() {
 	uploadCmd.Flags().StringVar(&uploadOpts.Platform, "platform", "", "platform for the artifact")
 	uploadCmd.Flags().StringVar(&uploadOpts.Arch, "arch", "", "arch for the artifact")
 	uploadCmd.Flags().StringVar(&uploadOpts.Checksum, "checksum", "", "pre-calculated checksum for the artifact (defaults using sha-512)")
-	uploadCmd.Flags().StringVar(&uploadOpts.ChecksumAlgorithm, "checksum-algorithm", "sha-512", "the signing algorithm to use, one of: sha-512, sha-256")
+	uploadCmd.Flags().StringVar(&uploadOpts.ChecksumAlgorithm, "checksum-algorithm", "sha-512", "the checksum algorithm to use, one of: sha-512, sha-256")
+	uploadCmd.Flags().StringVar(&uploadOpts.ChecksumEncoding, "checksum-encoding", "base64", "the checksum encoding to use, one of: base64, hex")
 	uploadCmd.Flags().StringVar(&uploadOpts.Signature, "signature", "", "pre-calculated signature for the artifact (defaults using ed25519ph)")
 	uploadCmd.Flags().StringVar(&uploadOpts.SigningAlgorithm, "signing-algorithm", "ed25519ph", "the signing algorithm to use, one of: ed25519ph, ed25519")
+	uploadCmd.Flags().StringVar(&uploadOpts.SignatureEncoding, "signature-encoding", "base64", "the signature encoding to use, one of: base64, hex")
 	uploadCmd.Flags().StringVar(&uploadOpts.SigningKeyPath, "signing-key", "", "path to ed25519 private key for signing the artifact [$KEYGEN_SIGNING_KEY_PATH=<path>, $KEYGEN_SIGNING_KEY=<key>]")
 	uploadCmd.Flags().BoolVar(&uploadOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
 	uploadCmd.Flags().StringVar(&uploadOpts.Metadata, "metadata", "", "JSON string of metadata key-value pairs")
@@ -370,7 +374,14 @@ func calculateChecksum(file *os.File) (string, error) {
 
 	digest := h.Sum(nil)
 
-	return base64.RawStdEncoding.EncodeToString(digest), nil
+	switch uploadOpts.ChecksumEncoding {
+	case "base64":
+		return base64.RawStdEncoding.EncodeToString(digest), nil
+	case "hex":
+		return hex.EncodeToString(digest), nil
+	default:
+		return "", fmt.Errorf(`checksum encoding "%s" is not supported`, uploadOpts.ChecksumEncoding)
+	}
 }
 
 func calculateSignature(encSigningKey string, file *os.File) (string, error) {
@@ -420,5 +431,12 @@ func calculateSignature(encSigningKey string, file *os.File) (string, error) {
 		return "", fmt.Errorf(`signing algorithm "%s" is not supported`, uploadOpts.SigningAlgorithm)
 	}
 
-	return base64.RawStdEncoding.EncodeToString(sig), nil
+	switch uploadOpts.SignatureEncoding {
+	case "base64":
+		return base64.RawStdEncoding.EncodeToString(sig), nil
+	case "hex":
+		return hex.EncodeToString(sig), nil
+	default:
+		return "", fmt.Errorf(`signature encoding "%s" is not supported`, uploadOpts.SignatureEncoding)
+	}
 }

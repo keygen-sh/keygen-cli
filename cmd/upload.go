@@ -3,12 +3,14 @@ package cmd
 import (
 	"bufio"
 	"crypto"
+	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"hash"
 	"io"
 	"io/ioutil"
 	"os"
@@ -51,19 +53,20 @@ Docs:
 )
 
 type UploadCommandOptions struct {
-	Filename         string
-	Filetype         string
-	Platform         string
-	Arch             string
-	Release          string
-	Package          string
-	Signature        string
-	Checksum         string
-	SigningAlgorithm string
-	SigningKeyPath   string
-	SigningKey       string
-	NoAutoUpgrade    bool
-	Metadata         string
+	Filename          string
+	Filetype          string
+	Platform          string
+	Arch              string
+	Release           string
+	Package           string
+	Signature         string
+	Checksum          string
+	ChecksumAlgorithm string
+	SigningAlgorithm  string
+	SigningKeyPath    string
+	SigningKey        string
+	NoAutoUpgrade     bool
+	Metadata          string
 }
 
 func init() {
@@ -78,8 +81,9 @@ func init() {
 	uploadCmd.Flags().StringVar(&uploadOpts.Filetype, "filetype", "<auto>", "filetype for the artifact (defaults to extname of <path>)")
 	uploadCmd.Flags().StringVar(&uploadOpts.Platform, "platform", "", "platform for the artifact")
 	uploadCmd.Flags().StringVar(&uploadOpts.Arch, "arch", "", "arch for the artifact")
-	uploadCmd.Flags().StringVar(&uploadOpts.Signature, "signature", "", "pre-calculated signature for the artifact (defaults using ed25519ph)")
 	uploadCmd.Flags().StringVar(&uploadOpts.Checksum, "checksum", "", "pre-calculated checksum for the artifact (defaults using sha-512)")
+	uploadCmd.Flags().StringVar(&uploadOpts.ChecksumAlgorithm, "checksum-algorithm", "sha-512", "the signing algorithm to use, one of: sha-512, sha-256")
+	uploadCmd.Flags().StringVar(&uploadOpts.Signature, "signature", "", "pre-calculated signature for the artifact (defaults using ed25519ph)")
 	uploadCmd.Flags().StringVar(&uploadOpts.SigningAlgorithm, "signing-algorithm", "ed25519ph", "the signing algorithm to use, one of: ed25519ph, ed25519")
 	uploadCmd.Flags().StringVar(&uploadOpts.SigningKeyPath, "signing-key", "", "path to ed25519 private key for signing the artifact [$KEYGEN_SIGNING_KEY_PATH=<path>, $KEYGEN_SIGNING_KEY=<key>]")
 	uploadCmd.Flags().BoolVar(&uploadOpts.NoAutoUpgrade, "no-auto-upgrade", false, "disable automatic upgrade checks [$KEYGEN_NO_AUTO_UPGRADE=1]")
@@ -349,8 +353,16 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 
 func calculateChecksum(file *os.File) (string, error) {
 	defer file.Seek(0, io.SeekStart) // reset reader
+	var h hash.Hash
 
-	h := sha512.New()
+	switch uploadOpts.ChecksumAlgorithm {
+	case "sha-512":
+		h = sha512.New()
+	case "sha-256":
+		h = sha256.New()
+	default:
+		return "", fmt.Errorf(`checksum algorithm "%s" is not supported`, uploadOpts.ChecksumAlgorithm)
+	}
 
 	if _, err := io.Copy(h, file); err != nil {
 		return "", err

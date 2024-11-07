@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"crypto"
+	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/base64"
@@ -84,7 +85,7 @@ func init() {
 	uploadCmd.Flags().StringVar(&uploadOpts.Platform, "platform", "", "platform for the artifact")
 	uploadCmd.Flags().StringVar(&uploadOpts.Arch, "arch", "", "arch for the artifact")
 	uploadCmd.Flags().StringVar(&uploadOpts.Checksum, "checksum", "", "pre-calculated checksum for the artifact (defaults using sha-512)")
-	uploadCmd.Flags().StringVar(&uploadOpts.ChecksumAlgorithm, "checksum-algorithm", "sha-512", "the checksum algorithm to use, one of: sha-512, sha-256")
+	uploadCmd.Flags().StringVar(&uploadOpts.ChecksumAlgorithm, "checksum-algorithm", "sha-512", "the checksum algorithm to use, one of: sha-512, sha-256, sha-1")
 	uploadCmd.Flags().StringVar(&uploadOpts.ChecksumEncoding, "checksum-encoding", "base64", "the checksum encoding to use, one of: base64, hex")
 	uploadCmd.Flags().StringVar(&uploadOpts.Signature, "signature", "", "pre-calculated signature for the artifact (defaults using ed25519ph)")
 	uploadCmd.Flags().StringVar(&uploadOpts.SigningAlgorithm, "signing-algorithm", "ed25519ph", "the signing algorithm to use, one of: ed25519ph, ed25519")
@@ -364,6 +365,8 @@ func calculateChecksum(file *os.File) (string, error) {
 		h = sha512.New()
 	case "sha-256":
 		h = sha256.New()
+	case "sha-1":
+		h = sha1.New()
 	default:
 		return "", fmt.Errorf(`checksum algorithm "%s" is not supported`, uploadOpts.ChecksumAlgorithm)
 	}

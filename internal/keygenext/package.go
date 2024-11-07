@@ -1,6 +1,8 @@
 package keygenext
 
 import (
+	"net/url"
+
 	"github.com/keygen-sh/jsonapi-go"
 	"github.com/keygen-sh/keygen-go/v2"
 )
@@ -62,7 +64,7 @@ func (p *Package) Get() error {
 		&keygen.ClientOptions{Account: Account, Environment: Environment, Token: Token, PublicKey: PublicKey, UserAgent: UserAgent, APIURL: APIURL},
 	)
 
-	res, err := client.Get("packages/"+p.ID, nil, p)
+	res, err := client.Get("packages/"+url.PathEscape(p.ID), nil, p)
 	if err != nil {
 		if res != nil && len(res.Document.Errors) > 0 {
 			e := res.Document.Errors[0]

@@ -120,9 +120,10 @@ func (r *Release) Get() error {
 	// TODO(ezekg) Add support for custom query params to SDK
 	type querystring struct {
 		Package string `url:"package,omitempty"`
+		Product string `url:"product,omitempty"`
 	}
 
-	qs := querystring{Package: *r.PackageID}
+	qs := querystring{Package: *r.PackageID, Product: r.ProductID}
 	values, err := query.Values(qs)
 	if err != nil {
 		return err

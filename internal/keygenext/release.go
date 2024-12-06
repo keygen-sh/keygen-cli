@@ -123,7 +123,7 @@ func (r *Release) Get() error {
 		Product string `url:"product,omitempty"`
 	}
 
-	qs := querystring{Package: *r.PackageID, Product: r.ProductID}
+	qs := querystring{Package: *r.PackageID, Product: Product}
 	values, err := query.Values(qs)
 	if err != nil {
 		return err

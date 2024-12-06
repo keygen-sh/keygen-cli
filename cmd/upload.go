@@ -266,7 +266,6 @@ func uploadRun(cmd *cobra.Command, args []string) error {
 	release := &keygenext.Release{
 		ID:        uploadOpts.Release,
 		PackageID: &uploadOpts.Package,
-		ProductID: keygenext.Product,
 	}
 
 	// get actual release id w/ filters e.g. package
